@@ -1,67 +1,77 @@
 ---
 name: production-grade
-description: Use when building a complete production-ready SaaS, platform, or service from scratch. Triggers on "production grade", "build a SaaS", "full stack project", "production ready", "build a platform", "build me a service", or when a project needs the complete pipeline from business requirements through architecture to deployment. This is a fully autonomous pipeline — the user sits at the CEO/CTO seat.
+description: Orchestrates a fully autonomous production pipeline from idea to deployed system. Triggers on "production grade", "build a SaaS", "full stack", "production ready", "build me a", "build a platform", or any greenfield project needing the complete define-build-harden-ship-sustain pipeline. The user sits at the CEO/CTO seat — this skill handles everything else.
+context: fork
+agent: general-purpose
+hooks:
+  - event: UserPromptSubmit
+    pattern: "production.grade|build.a.saas|full.stack|production.ready|build.me|build.a.platform"
+    action: "evaluate-activate-implement"
 ---
 
 # Production Grade
 
+!`git status 2>/dev/null || echo "No git repo detected"`
+!`cat CLAUDE.md 2>/dev/null || echo "No CLAUDE.md found"`
+!`ls Claude-Production-Grade-Suite/ 2>/dev/null || echo "No existing workspace"`
+
 ## Overview
 
-Fully autonomous meta-skill orchestrator. The user gives a high-level vision ("Build me a SaaS for X") and this skill runs the entire production pipeline: define, build, harden, ship, and sustain — with minimal user intervention. Each phase runs its own agent, builds environments, executes code, runs tests, debugs failures, and deploys locally. The user approves at strategic gates only.
+Fully autonomous meta-skill orchestrator. The user gives a high-level vision and this skill runs the entire production pipeline — define, build, harden, ship, sustain — with minimal user intervention. Five consolidated agents invoke 13 individual skills internally. The user approves at 3 strategic gates only.
 
 **All skills are bundled in this plugin. Single install, everything included.**
 
+**Partial execution:** Parse `$ARGUMENTS` to detect subset requests. If `$ARGUMENTS` contains "just build", "just define", "just harden", "just ship", or "just document", execute only that phase group. Use `$0` for the command and `$1` onward for scope qualifiers.
+
 ## When to Use
 
-- Starting a new SaaS product or platform from scratch
+- Starting a new SaaS, platform, or service from scratch
 - Building a complete production-ready system end-to-end
-- When you want to go from idea to working, tested, secured, deployed code
+- Going from idea to working, tested, secured, deployed code
 - Greenfield projects that need the full treatment
 - User says "build me a...", "production grade", "production ready"
 
-## Pipeline Kickoff Behavior
+## Pipeline Kickoff
 
-When this skill is triggered, follow this EXACT sequence:
+When triggered, follow this EXACT sequence:
 
 1. **Print kickoff banner** immediately:
 ```
 ━━━ Production Grade Pipeline ━━━━━━━━━━━━━━━━━━━━━━
 Project: [extracted from user's message]
+Session: ${CLAUDE_SESSION_ID}
 ⧖ Initializing workspace and analyzing request...
 ```
 
-2. **Create workspace** (`mkdir -p Claude-Production-Grade-Suite/.orchestrator/`)
+2. **Create workspace** — `mkdir -p Claude-Production-Grade-Suite/.orchestrator/memory/shared`
 
-3. **Research the domain** — use WebSearch to understand the product space, competitors, and relevant APIs. Do this BEFORE asking the user anything.
+3. **Detect existing workspace** — if `.orchestrator/pipeline-state.json` exists, offer to resume or restart.
 
-4. **Write execution plan** to `.orchestrator/execution-plan.md`
+4. **Research the domain** — use WebSearch before asking the user anything.
 
-5. **Print the plan summary** (not the full file — just which phases are active and what's parallel)
+5. **Write execution plan** to `.orchestrator/execution-plan.md`
 
-6. **Immediately start Phase 1** — do NOT ask "should I proceed?" or present the plan for approval. The plan is informational. Start working.
+6. **Print plan summary** and immediately start Phase 1. Do NOT ask "should I proceed?"
 
-7. **At each gate**, use the exact AskUserQuestion patterns defined in the UX Protocol below.
+7. **At each gate**, use the exact AskUserQuestion patterns from the UX Protocol below.
 
-**Key principle:** The user already told you what to build. Don't re-ask. Research, plan, and start building. Only pause at the 3 approval gates.
+**Key principle:** The user already told you what to build. Research, plan, start building. Only pause at the 3 approval gates.
 
 ## User Experience Protocol
 
-**CRITICAL: This section defines HOW you interact with the user. Follow it exactly.**
-
-This skill runs as a **fully autonomous, continuous pipeline** in the terminal. The user should never need to type — they navigate with arrow keys and press Enter.
+**CRITICAL: Follow this section exactly.**
 
 ### RULE 1: NEVER Ask Open-Ended Questions
 
-**NEVER output text that expects the user to type a response.** Every single user interaction MUST go through the `AskUserQuestion` tool with predefined options. The user navigates with arrow up/down and selects with Enter.
+**NEVER output text that expects the user to type a response.** Every interaction MUST use `AskUserQuestion` with predefined options.
 
-**WRONG — never do this:**
+**WRONG:**
 ```
 Do you approve the BRD? Please type yes or no.
 What do you think about the architecture?
-Approve architecture to start autonomous BUILD phase?
 ```
 
-**RIGHT — always do this:**
+**RIGHT:**
 ```python
 AskUserQuestion(questions=[{
   "question": "BRD is complete (12 user stories, 8 acceptance criteria). Ready to proceed?",
@@ -106,12 +116,10 @@ The first option should always be the recommended/default action with `(Recommen
 ✓ API routes implemented (17 endpoints)
 
 ━━━ Phase N Complete ━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Summary: Backend service with 17 endpoints, 9 DB tables, PayOS integration
+Summary: Backend service with 17 endpoints, 9 DB tables
 ```
 
-### RULE 6: Gate Interactions (Mandatory AskUserQuestion Calls)
-
-These are the EXACT interactions at each gate. Copy these patterns:
+### RULE 6: Gate Interactions
 
 **Gate 1 — BRD Approval:**
 ```python
@@ -158,21 +166,6 @@ AskUserQuestion(questions=[{
 }])
 ```
 
-**Mid-Phase Decisions (when needed):**
-```python
-AskUserQuestion(questions=[{
-  "question": "[Specific decision needed]?",
-  "header": "[Short label]",
-  "options": [
-    {"label": "[Best option] (Recommended)", "description": "[Why this is recommended]"},
-    {"label": "[Alternative 1]", "description": "[Trade-off explanation]"},
-    {"label": "[Alternative 2]", "description": "[Trade-off explanation]"},
-    {"label": "Chat about this", "description": "Type your own preference"}
-  ],
-  "multiSelect": false
-}])
-```
-
 ### RULE 7: Autonomy Between Gates
 
 1. **Default to sensible choices** — don't ask the user for every minor decision
@@ -181,490 +174,235 @@ AskUserQuestion(questions=[{
 4. **Report, don't ask** — "I chose PostgreSQL because [reason]" not "Which database?"
 5. **Batch questions** — use `multiSelect: true` or multiple questions in one AskUserQuestion call
 
-## Workspace Architecture
+## Consolidated Agent Architecture
 
-All agent work happens in a single workspace folder at the project root. This is the agents' territory — it does NOT pollute the main codebase. Agents read from and write to their own workspace folders, and cross-reference each other's outputs through the shared root.
+Five agents with sub-modes replace the previous 13-agent design. Each agent invokes individual skills internally but operates with a single context window per agent group, reducing context waste.
 
-```
-Claude-Production-Grade-Suite/
-├── .orchestrator/                # Pipeline state, logs, decisions
-│   ├── pipeline-state.json       # Current phase, status, timestamps
-│   ├── decisions-log.md          # All user approvals and context bridging
-│   └── agent-activity.log        # Cross-agent activity feed
-├── product-manager/              # Phase 1: Requirements
-│   ├── BRD/                      # Business requirements documents
-│   └── research/                 # Domain research notes
-├── solution-architect/           # Phase 2: Architecture
-│   ├── docs/                     # ADRs, diagrams, tech stack
-│   ├── api/                      # OpenAPI, gRPC, AsyncAPI specs
-│   ├── schemas/                  # ERD, migrations
-│   └── scaffold/                 # Project structure template
-├── software-engineer/            # Phase 3a: Backend implementation
-│   ├── services/                 # Implemented services
-│   ├── libs/                     # Shared libraries
-│   ├── scripts/                  # Dev scripts, seed data
-│   └── logs/                     # Build logs, debug logs
-├── frontend-engineer/            # Phase 3b: Frontend (if applicable)
-│   ├── app/                      # Frontend application
-│   ├── storybook/                # Component docs
-│   └── logs/                     # Build logs
-├── qa-engineer/                  # Phase 4: Testing
-│   ├── unit/                     # Unit tests
-│   ├── integration/              # Integration tests
-│   ├── e2e/                      # End-to-end tests
-│   ├── performance/              # Load tests
-│   └── coverage/                 # Coverage reports
-├── security-engineer/            # Phase 5a: Security audit
-│   ├── threat-model/             # STRIDE analysis
-│   ├── code-audit/               # OWASP review
-│   ├── pen-test/                 # Penetration test plans
-│   └── remediation/              # Fix plans
-├── code-reviewer/                # Phase 5b: Quality gate
-│   ├── findings/                 # Review findings by severity
-│   ├── metrics/                  # Code quality metrics
-│   └── auto-fixes/               # Suggested fixes
-├── devops/                       # Phase 6: Infrastructure
-│   ├── terraform/                # Multi-cloud IaC
-│   ├── ci-cd/                    # Pipelines
-│   ├── containers/               # Docker, K8s
-│   └── monitoring/               # Prometheus, Grafana
-├── sre/                          # Phase 7: Production readiness
-│   ├── production-readiness/     # Checklist, findings
-│   ├── chaos/                    # Chaos engineering scenarios
-│   ├── incidents/                # Incident management setup
-│   └── runbooks/                 # Operational runbooks
-├── data-scientist/               # Phase 7b: AI/ML/LLM optimization
-│   ├── analysis/                 # System audit, cost models
-│   ├── llm-optimization/         # Prompt library, token analysis, caching
-│   ├── experiments/              # A/B testing framework, studies
-│   ├── data-pipeline/            # Analytics architecture, ETL
-│   ├── ml-infrastructure/        # Feature store, model serving
-│   └── studies/                  # Scientific research documents
-├── technical-writer/             # Phase 8: Documentation
-│   ├── docs/                     # All documentation
-│   ├── docusaurus/               # Doc site scaffold
-│   └── api-reference/            # Auto-generated API docs
-└── skill-maker/                  # Phase 9: Custom skills
-    └── custom-skills/            # Project-specific skills
-```
+| Agent | Modes | Skills Invoked | Gates |
+|-------|-------|---------------|-------|
+| **DEFINE** | PM, Architect | `product-manager`, `solution-architect` | Gate 1, Gate 2 |
+| **BUILD** | Backend, Frontend, QA | `software-engineer`, `frontend-engineer`, `qa-engineer` | None (autonomous) |
+| **HARDEN** | Security, Code Review | `security-engineer`, `code-reviewer` | None (autonomous) |
+| **SHIP** | DevOps, SRE, Data Science | `devops`, `sre`, `data-scientist` | Gate 3 |
+| **SUSTAIN** | Docs, Skills, Learning | `technical-writer`, `skill-maker` | None (autonomous) |
 
-## Operating Model: User as CEO/CTO
+### How to Dispatch Agents
 
-The user gives high-level directives. The pipeline handles everything else. All agent interactions follow the **User Experience Protocol** defined above — continuous execution with real-time terminal updates, multiple-choice questions only, and autonomous decision-making between strategic gates.
-
-### User Responsibilities (Minimal)
-- Describe the product vision (one paragraph is enough)
-- Approve BRD (Phase 1 gate)
-- Approve architecture (Phase 2 gate)
-- Approve production readiness (Phase 7 gate)
-- Answer clarifying questions when asked (the pipeline minimizes these)
-
-### Pipeline Responsibilities (Autonomous)
-- Interview the user efficiently (batch questions, use sensible defaults)
-- Research the domain and competitors
-- Design architecture and select tech stack
-- Write all implementation code
-- Build local dev environments (docker-compose, dependencies)
-- Run all code and verify it compiles/builds
-- Write and execute tests — debug and fix failures autonomously
-- Perform security audit and fix critical issues
-- Set up CI/CD, infrastructure, monitoring
-- Validate production readiness
-- Write comprehensive documentation
-- Optimize AI/ML/LLM systems for cost, quality, and performance
-- Create project-specific skills for ongoing development
-
-## Orchestration Flow
-
-```dot
-digraph pg {
-    rankdir=TB;
-    node [fontsize=10];
-
-    "CEO/CTO Command" [shape=doublecircle, style=filled, fillcolor="#ffeb3b"];
-
-    subgraph cluster_define {
-        label="DEFINE"; style=filled; color="#e8f5e9";
-        "Phase 1: Product Manager" [shape=box];
-        "Phase 2: Solution Architect" [shape=box];
-    }
-
-    subgraph cluster_build {
-        label="BUILD (Autonomous)"; style=filled; color="#e3f2fd";
-        "Phase 3a: Software Engineer" [shape=box];
-        "Phase 3b: Frontend Engineer" [shape=box];
-        "Phase 4: QA Engineer" [shape=box];
-    }
-
-    subgraph cluster_harden {
-        label="HARDEN (Autonomous)"; style=filled; color="#fff3e0";
-        "Phase 5a: Security Engineer" [shape=box];
-        "Phase 5b: Code Reviewer" [shape=box];
-    }
-
-    subgraph cluster_ship {
-        label="SHIP"; style=filled; color="#fce4ec";
-        "Phase 6: DevOps" [shape=box];
-        "Phase 7: SRE" [shape=box];
-    }
-
-    subgraph cluster_sustain {
-        label="SUSTAIN (Autonomous)"; style=filled; color="#f3e5f5";
-        "Phase 8: Technical Writer" [shape=box];
-        "Phase 9: Skill Maker" [shape=box];
-    }
-
-    "BRD Approval" [shape=diamond, style=filled, fillcolor="#ffcdd2"];
-    "Arch Approval" [shape=diamond, style=filled, fillcolor="#ffcdd2"];
-    "Prod Readiness" [shape=diamond, style=filled, fillcolor="#ffcdd2"];
-    "Production Ready" [shape=doublecircle, style=filled, fillcolor="#4caf50", fontcolor=white];
-
-    "CEO/CTO Command" -> "Phase 1: Product Manager";
-    "Phase 1: Product Manager" -> "BRD Approval";
-    "BRD Approval" -> "Phase 1: Product Manager" [label="revise"];
-    "BRD Approval" -> "Phase 2: Solution Architect" [label="approved"];
-    "Phase 2: Solution Architect" -> "Arch Approval";
-    "Arch Approval" -> "Phase 2: Solution Architect" [label="revise"];
-    "Arch Approval" -> "Phase 3a: Software Engineer" [label="approved"];
-    "Arch Approval" -> "Phase 3b: Frontend Engineer" [label="if UI needed"];
-    "Phase 3a: Software Engineer" -> "Phase 4: QA Engineer";
-    "Phase 3b: Frontend Engineer" -> "Phase 4: QA Engineer";
-    "Phase 4: QA Engineer" -> "Phase 5a: Security Engineer";
-    "Phase 4: QA Engineer" -> "Phase 5b: Code Reviewer";
-    "Phase 5a: Security Engineer" -> "Phase 6: DevOps";
-    "Phase 5b: Code Reviewer" -> "Phase 6: DevOps";
-    "Phase 6: DevOps" -> "Phase 7: SRE";
-    "Phase 7: SRE" -> "Prod Readiness";
-    "Prod Readiness" -> "Phase 7: SRE" [label="fix issues"];
-    "Prod Readiness" -> "Phase 7b: Data Scientist" [label="if AI/ML/LLM"];
-    "Prod Readiness" -> "Phase 8: Technical Writer" [label="approved"];
-    "Phase 7b: Data Scientist" -> "Phase 8: Technical Writer";
-    "Phase 8: Technical Writer" -> "Phase 9: Skill Maker";
-    "Phase 9: Skill Maker" -> "Production Ready";
-}
-```
-
-## Master Orchestrator Intelligence
-
-The production-grade skill is NOT a dumb sequential runner. It is an **intelligent orchestrator** that observes, plans, adapts, and coordinates the entire pipeline dynamically.
-
-### Orchestrator Responsibilities
-
-1. **Plan the pipeline** before executing anything:
-   - Analyze the user's request to determine which phases are needed
-   - Create an execution plan in `Claude-Production-Grade-Suite/.orchestrator/execution-plan.md`
-   - Decide if frontend is needed, if AI/ML optimization applies, what can run in parallel
-   - Present the plan to the user for quick approval
-
-2. **Observe agent progress** in real-time:
-   - After each phase, read the agent's output and logs
-   - Update `pipeline-state.json` with phase status, duration, findings count
-   - Update `agent-activity.log` with what each agent produced
-
-3. **Dynamically adapt the plan:**
-   - If the architect decides on a simpler monolith → adjust DevOps to skip K8s, simplify CI/CD
-   - If no frontend is needed → skip Phase 3b entirely
-   - If implementation reveals new requirements → note them for PM feedback
-   - If security audit finds critical issues → re-invoke software engineer to fix before DevOps
-   - If tests fail → decide whether to fix or flag to user based on severity
-
-4. **Context bridge between agents:**
-   - After each phase, write a brief summary to `.orchestrator/decisions-log.md`
-   - When invoking the next agent, provide a context brief: "Here's what previous agents decided and produced"
-   - Prevent redundant work — if PM already answered a question, don't let Architect re-ask it
-
-5. **Status reporting to user:**
-   - After each major phase completion, give a one-line status update
-   - Only escalate to user when: approval gates, blocking issues, or ambiguous decisions
-   - End-of-pipeline summary with full report
-
-### Execution Plan Template
-
-Before starting the pipeline, generate and present:
-
-```markdown
-# Execution Plan
-
-**Project:** <name from user's description>
-**Estimated Phases:** <N> of 10
-
-## Pipeline Configuration
-- [ ] Phase 1: Product Manager — REQUIRED
-- [ ] Phase 2: Solution Architect — REQUIRED
-- [ ] Phase 3a: Software Engineer — REQUIRED
-- [ ] Phase 3b: Frontend Engineer — <YES/NO based on user's description>
-- [ ] Phase 4: QA Engineer — REQUIRED
-- [ ] Phase 5a: Security Engineer — REQUIRED
-- [ ] Phase 5b: Code Reviewer — REQUIRED
-- [ ] Phase 6: DevOps — REQUIRED
-- [ ] Phase 7: SRE — REQUIRED
-- [ ] Phase 7b: Data Scientist — <YES/NO based on AI/ML/LLM usage>
-- [ ] Phase 8: Technical Writer — REQUIRED
-- [ ] Phase 9: Skill Maker — RECOMMENDED
-
-## Parallelization
-- Phases 3a + 3b can run in parallel
-- Phases 5a + 5b can run in parallel
-
-## Approval Gates (User Input Required)
-1. After Phase 1: BRD approval
-2. After Phase 2: Architecture approval
-3. After Phase 7: Production readiness approval
-
-## Everything Else: Fully Autonomous
-```
-
-### Adaptive Orchestration Rules
-
-| Situation | Orchestrator Action |
-|-----------|-------------------|
-| User says "simple API, no frontend" | Skip Phase 3b, simplify DevOps (no CDN, no frontend CI) |
-| Architect picks monolith over microservices | Adjust DevOps: single Dockerfile, simpler K8s, no service mesh |
-| Implementation uses LLM APIs | Auto-enable Phase 7b (Data Scientist) |
-| Security finds critical vulnerability | Pause pipeline → re-invoke Software Engineer to fix → resume |
-| QA test failures > 20% | Flag to user: "Tests are failing. Implementation may need review." |
-| Code reviewer finds architecture drift | Warn user, don't auto-fix (architecture decisions are user-approved) |
-| SRE finds production readiness gaps | Create remediation tasks, fix autonomously if possible |
-| User says "skip testing" | Warn against it, proceed if user insists, mark in decisions-log |
-
-## How to Invoke Sub-Skills
-
-There are two ways to run each phase. Choose based on complexity:
-
-### Option A: Skill Tool (Simple, Sequential)
+**Option A: Skill Tool (simple, sequential, needs user interaction)**
 ```python
 Skill(skill="product-manager")
-Skill(skill="solution-architect")
-Skill(skill="software-engineer")
 ```
-Use when: the phase is straightforward, you want to stay in the main conversation, or the skill needs direct user interaction (Gates 1-3).
 
-### Option B: Agent Tool (Complex, Parallel, Background)
+**Option B: Agent Tool (complex, parallel, background work)**
 ```python
 Agent(
-  prompt="You are the Software Engineer. Read architecture at Claude-Production-Grade-Suite/solution-architect/ and implement the full backend service...",
+  prompt="You are the BUILD Agent in Backend mode. Read architecture at Claude-Production-Grade-Suite/solution-architect/ and implement the full backend...",
   subagent_type="general-purpose",
   mode="bypassPermissions",
   run_in_background=True
 )
 ```
-Use when: the phase is large (implementation, architecture design), can run in background, or you want to run multiple phases in parallel (e.g., Software Engineer + Frontend Engineer).
 
-### Parallelization Strategy
-- **Phases 3a + 3b** (Software + Frontend): Launch both as background Agents simultaneously
-- **Phases 5a + 5b** (Security + Code Review): Launch both as background Agents simultaneously
-- **All other phases**: Run sequentially (each depends on the previous)
+Use forked context (`context: fork`) for heavy subagent work. Subagents return condensed 1-2k token summaries. Main context stays clean.
 
-### Context Passing
-When dispatching an Agent, always include in the prompt:
-1. What workspace folders to read from (see Context Bridging Rules)
-2. What workspace folder to write to
-3. Key decisions from previous phases (copy from decisions-log.md)
-4. Specific requirements from the BRD relevant to this phase
+### Parallelization
+
+- **BUILD:** Backend + Frontend modes run in parallel (both as background Agents)
+- **HARDEN:** Security + Code Review modes run in parallel (both as background Agents)
+- **All other transitions:** Sequential (each depends on previous output)
+
+## Workspace Architecture
+
+```
+Claude-Production-Grade-Suite/
+├── .orchestrator/                # Pipeline state and memory
+│   ├── pipeline-state.json       # Current phase, branch, timestamps
+│   ├── execution-plan.md         # Pipeline configuration
+│   ├── decisions-log.md          # All decisions with git commit refs
+│   ├── learnings.md              # Compound learning accumulation
+│   ├── agent-activity.log        # Cross-agent activity feed
+│   └── memory/                   # Branch-aware persistent memory
+│       ├── {branch-name}/        # Per-branch state
+│       └── shared/               # Cross-branch knowledge
+├── product-manager/              # DEFINE: Requirements
+├── solution-architect/           # DEFINE: Architecture
+├── software-engineer/            # BUILD: Backend
+├── frontend-engineer/            # BUILD: Frontend (if applicable)
+├── qa-engineer/                  # BUILD: Testing
+├── security-engineer/            # HARDEN: Security audit
+├── code-reviewer/                # HARDEN: Quality gate
+├── devops/                       # SHIP: Infrastructure
+├── sre/                          # SHIP: Production readiness
+├── data-scientist/               # SHIP: AI/ML optimization (conditional)
+├── technical-writer/             # SUSTAIN: Documentation
+└── skill-maker/                  # SUSTAIN: Custom skills
+```
 
 ## Execution Protocol
 
-### Step 0: Initialize Workspace
+### Phase 0: Initialize
 
-```
-━━━ Phase 0: Initialize Workspace ━━━━━━━━━━━━━━━━━━━━━━
-Creating Claude-Production-Grade-Suite directory structure...
-
-✓ .orchestrator/ created (pipeline-state.json, decisions-log.md, agent-activity.log)
-⧖ Analyzing user request to build execution plan...
-
-━━━ Phase 0 Complete ━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Summary: Workspace initialized, execution plan ready for review.
-```
+Create workspace. Initialize `pipeline-state.json` with current git branch. Write execution plan. Start immediately.
 
 ```python
-# Create the workspace structure
-Claude-Production-Grade-Suite/
-└── .orchestrator/
-    ├── pipeline-state.json   # {"phase": 1, "status": "running", "started": "..."}
-    ├── decisions-log.md      # Empty, will be populated
-    └── agent-activity.log    # Empty, will be populated
+# Detect branch for memory isolation
+branch = !`git branch --show-current 2>/dev/null || echo "main"`
+# Initialize state
+pipeline-state.json = {"phase": 0, "branch": branch, "status": "initializing"}
 ```
 
-Use `mkdir -p` to create the workspace. Initialize `pipeline-state.json` with phase 1.
+### DEFINE Agent (Phases 1-2)
 
-### Step 1: Product Manager (DEFINE)
+See `phases/define.md` for detailed PM and Architect mode instructions.
 
+**Phase 1: Product Manager mode.** Invoke `Skill: product-manager`. Research domain, write BRD, present Gate 1.
+
+**Phase 2: Solution Architect mode.** Invoke `Skill: solution-architect`. Read BRD, design architecture, present Gate 2.
+
+### BUILD Agent (Phases 3-4)
+
+See `phases/build.md` for detailed Backend, Frontend, and QA mode instructions.
+
+**Phase 3: Backend + Frontend modes (parallel).** Invoke `Skill: software-engineer` and optionally `Skill: frontend-engineer` as background Agents. TDD enforced: write test, watch fail, implement, watch pass, refactor.
+
+**Validation loop runs per service:**
 ```
-━━━ Phase 1: Product Manager ━━━━━━━━━━━━━━━━━━━━━━
-```
-
-**How to invoke:** Use the `Skill` tool with `skill: "product-manager"`. Do NOT read the skill file — invoke it.
-
-This phase:
-- Conducts a brief CEO interview using **AskUserQuestion only** (3-5 questions max, batch them)
-- Researches the domain via web search
-- Writes BRD to `Claude-Production-Grade-Suite/product-manager/BRD/`
-- **GATE 1:** Use the Gate 1 AskUserQuestion pattern from the UX Protocol above
-- Log approval to `decisions-log.md`
-
-### Step 2: Solution Architect (DEFINE)
-
-```
-━━━ Phase 2: Solution Architect ━━━━━━━━━━━━━━━━━━━━━━
+while not valid: build() -> if fail: fix(errors) -> rebuild()
+while not valid: test()  -> if fail: fix(errors) -> retest()
 ```
 
-**How to invoke:** Use the `Skill` tool with `skill: "solution-architect"`. Alternatively, dispatch a background `Agent` with the full architecture brief (preferred for large designs).
+**Phase 4: QA mode.** Invoke `Skill: qa-engineer`. Integration, e2e, and performance tests. Distinguishes test bugs from implementation bugs.
 
-This phase:
-- Reads the BRD — skips questions already answered
-- Designs full architecture, selects tech stack
-- Creates API contracts, data models, project scaffold
-- Writes to `Claude-Production-Grade-Suite/solution-architect/`
-- **GATE 2:** Use the Gate 2 AskUserQuestion pattern from the UX Protocol above
-- Log approval to `decisions-log.md`
+### HARDEN Agent (Phases 5a-5b)
 
-### Step 3: Software Engineer + Frontend Engineer (BUILD — Autonomous)
+See `phases/harden.md` for detailed Security and Code Review mode instructions.
 
+**Phases 5a + 5b run in parallel.** Invoke `Skill: security-engineer` and `Skill: code-reviewer` as background Agents.
+
+**Multi-model review:** If external model APIs are available, dispatch reviews to OpenAI Codex and Google Gemini in parallel with Claude as primary + fallback. Aggregate findings, deduplicate, rank by severity. 3x review coverage when available.
+
+**Auto-remediation:** Critical/High issues fixed immediately with regression tests. Medium/Low documented but do not block pipeline.
+
+**Validation loop:**
 ```
-━━━ Phase 3: Build ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+while critical issues remain: fix() -> rescan() -> retest()
 ```
 
-**No user approval needed.** The agents work autonomously.
+### SHIP Agent (Phases 6-7)
 
-**How to invoke:** Dispatch as background `Agent` tasks. If frontend is needed, run both in parallel. Each agent gets a detailed prompt with workspace paths and architecture context.
+See `phases/ship.md` for detailed DevOps, SRE, and Data Scientist mode instructions.
 
-Invoke `Skill: software-engineer`. In parallel (if frontend needed), invoke `Skill: frontend-engineer`.
+**Phase 6: DevOps mode.** Invoke `Skill: devops`. Containerize, CI/CD, IaC, monitoring. Validate everything:
+```
+docker build -> docker-compose up -> terraform validate -> pipeline lint
+```
 
-These agents MUST:
-- Read architecture docs and API contracts from the workspace
-- Implement actual working code (not stubs or TODOs)
-- Build the local dev environment (docker-compose up)
-- Run the code and verify it compiles/starts
-- If build fails: read error output, debug, fix, and retry (up to 3 attempts)
-- Log all activity to their `logs/` folder
-- Write to `Claude-Production-Grade-Suite/software-engineer/` and `Claude-Production-Grade-Suite/frontend-engineer/`
+**Phase 7: SRE mode.** Invoke `Skill: sre`. Production readiness review, SLOs, chaos scenarios, runbooks. Present Gate 3.
 
-**Autonomous debugging protocol:**
-1. Run build/compile
-2. If error → analyze error message → identify root cause → fix → retry
-3. If still failing after 3 attempts → log the issue and notify user with specific error
-4. Never leave broken code — either fix it or clearly document what's wrong
+**Phase 7b: Data Scientist mode (conditional).** Auto-triggers if code imports LLM/ML libraries. Invoke `Skill: data-scientist`.
 
-### Step 4: QA Engineer (BUILD — Autonomous)
+### SUSTAIN Agent (Phases 8-9-10)
 
-**No user approval needed.**
+See `phases/sustain.md` for detailed Docs, Skills, and Compound Learning instructions.
 
-Invoke `Skill: qa-engineer`. This agent MUST:
-- Read implementation code from workspace
-- Write comprehensive test suites
-- **Actually run the tests** using docker-compose test environment
-- If tests fail: analyze failures → fix tests OR flag implementation bugs
-- Generate coverage report
-- Write to `Claude-Production-Grade-Suite/qa-engineer/`
+**Phase 8: Technical Writer mode.** Invoke `Skill: technical-writer`. API reference, dev guides, Docusaurus scaffold.
 
-**Self-healing test protocol:**
-1. Write tests based on API contracts and acceptance criteria
-2. Run tests via `make test` or equivalent
-3. Distinguish between test bugs and implementation bugs
-4. Fix test bugs immediately
-5. Implementation bugs → log as findings for code-reviewer
+**Phase 9: Skill Maker mode.** Invoke `Skill: skill-maker`. 3-5 project-specific skills.
 
-### Step 5: Security Engineer + Code Reviewer (HARDEN — Autonomous)
+**Phase 10: Compound Learning.** Capture what went wrong, patterns discovered, decisions made. Write to `.orchestrator/learnings.md`. Optionally append key patterns to project `CLAUDE.md`.
 
-**No user approval needed.** Can run in parallel.
+### Final Assembly
 
-Invoke `Skill: security-engineer` and `Skill: code-reviewer`.
+1. **Integrate code** from workspace to project root (ask user with AskUserQuestion).
+2. **Run final validation:** `docker-compose up`, `make test`, `terraform validate`, health checks.
+3. **Present final summary** (see template below).
 
-These agents:
-- Read all implementation code, tests, and architecture docs from workspace
-- Security engineer: performs STRIDE threat modeling, OWASP audit, dependency scan
-- Code reviewer: checks architecture conformance, code quality, performance
-- **Auto-fix critical and high severity issues** directly in the code
-- Write reports to their workspace folders
-- For issues they can't auto-fix: document clearly with remediation guidance
+## Orchestrator Intelligence
 
-**Auto-remediation protocol:**
-- Critical security issues (injection, broken auth, exposed secrets): fix immediately
-- High code quality issues (missing error handling, N+1 queries): fix immediately
-- Medium/Low issues: document in findings, don't block pipeline
+The orchestrator is NOT a dumb sequential runner. It observes, adapts, and coordinates.
 
-### Step 6: DevOps (SHIP)
+### Adaptive Rules
 
-Invoke `Skill: devops`. This agent:
-- Reads architecture and implementation from workspace
-- Generates Terraform, CI/CD, Docker, K8s configs
-- **Validates Terraform syntax** (`terraform validate`)
-- **Builds Docker images** locally to verify they work
-- **Runs docker-compose up** to verify the full stack starts
-- Write to `Claude-Production-Grade-Suite/devops/`
+| Situation | Action |
+|-----------|--------|
+| "Simple API, no frontend" | Skip Frontend mode, simplify DevOps |
+| Architect picks monolith | Single Dockerfile, skip K8s/service mesh |
+| Implementation uses LLM APIs | Auto-enable Data Scientist mode |
+| Security finds critical vuln | Re-invoke Backend mode to fix before SHIP |
+| QA failures > 20% | Flag to user: implementation may need review |
+| Code reviewer finds arch drift | Warn user (arch decisions are user-approved) |
+| User says "skip testing" | Warn against it, proceed if insisted, log in decisions |
 
-### Step 7: SRE (SHIP)
+### Context Bridging
 
-Invoke `Skill: sre`. This agent:
-- Reads DevOps configs and architecture from workspace
-- Performs production readiness review
-- Generates SLO definitions, chaos scenarios, incident playbooks
-- **GATE: User approves production readiness**
-- Write to `Claude-Production-Grade-Suite/sre/`
+Each agent reads from previous agents' workspace folders. No redundant interviews.
 
-### Step 7b: Data Scientist (SHIP — Conditional, Autonomous)
+| Agent | Reads From | Writes To |
+|-------|-----------|-----------|
+| DEFINE (PM) | User interview, web research | `product-manager/` |
+| DEFINE (Arch) | `product-manager/BRD/` | `solution-architect/` |
+| BUILD (Backend) | `solution-architect/api/`, `schemas/`, `scaffold/` | `software-engineer/` |
+| BUILD (Frontend) | `solution-architect/api/`, `product-manager/BRD/` | `frontend-engineer/` |
+| BUILD (QA) | `software-engineer/`, `frontend-engineer/`, `solution-architect/` | `qa-engineer/` |
+| HARDEN | All implementation + architecture folders | `security-engineer/`, `code-reviewer/` |
+| SHIP | `solution-architect/`, `software-engineer/`, HARDEN output | `devops/`, `sre/`, `data-scientist/` |
+| SUSTAIN | ALL workspace folders | `technical-writer/`, `skill-maker/`, `.orchestrator/` |
 
-**Triggers automatically if the system uses AI/ML/LLM APIs.** No user approval needed.
+## Security Hooks (Continuous)
 
-Invoke `Skill: data-scientist`. This agent:
-- Audits the codebase for AI/ML/LLM usage patterns
-- Optimizes prompts, reduces token costs, designs caching strategies
-- Sets up A/B testing and experiment framework
-- Designs analytics/data pipelines if needed
-- Conducts scientific studies with statistical rigor
-- Write to `Claude-Production-Grade-Suite/data-scientist/`
+Security is a continuous concern, not just a HARDEN phase activity. These hooks run during ALL phases:
 
-**Detection:** Scan implementation code for imports of `openai`, `anthropic`, `langchain`, `transformers`, `torch`, `tensorflow`, or any LLM/ML API calls. If found, this phase runs automatically.
+**PreToolUse — Block dangerous commands:**
+- Block `rm -rf /`, `chmod 777`, and destructive operations
+- Block execution of downloaded scripts without review
 
-### Step 8: Technical Writer (SUSTAIN — Autonomous)
+**Pre-commit — Credential scanning:**
+- Block `.env`, `.key`, `.pem`, `credentials.json` from git
+- Scan staged files for API keys, tokens, passwords, hardcoded secrets
 
-**No user approval needed.**
+**During implementation — Continuous scanning:**
+- Software Engineer mode scans for hardcoded secrets as it writes code
+- Any credential found is immediately replaced with env var reference
 
-Invoke `Skill: technical-writer`. This agent:
-- Reads ALL workspace folders to generate documentation
-- Creates API reference, developer guides, operational docs
-- Scaffolds Docusaurus documentation site
-- Write to `Claude-Production-Grade-Suite/technical-writer/`
+## Autonomous Agent Behavior Protocol
 
-### Step 9: Skill Maker (SUSTAIN — Autonomous)
+Every agent in this pipeline follows these rules:
 
-Invoke `Skill: skill-maker`. This agent:
-- Analyzes the project's patterns from the workspace
-- Suggests and creates 3-5 project-specific skills
-- Installs them locally for immediate use
-- Write to `Claude-Production-Grade-Suite/skill-maker/`
+### Build and Verify
+1. After writing code, **run it**. Compile, build, start services.
+2. After writing tests, **execute them**. Do not assume they pass.
+3. After writing infrastructure, **validate it** (`terraform validate`, `docker build`).
 
-### Step 10: Final Assembly
+### Validation Loop Pattern
+Every critical operation uses: `while not valid: fix(errors); validate()`
+- Code: compile -> fix -> rebuild
+- Tests: run -> fix -> rerun
+- IaC: validate -> fix -> revalidate
+- Security: verify fixes -> re-audit
 
-After all phases complete:
+### Self-Debug
+1. Read the error output. Identify root cause — do not guess.
+2. Fix and retry. After 3 failed attempts, stop and report to user with: error message, what you tried, what you think is wrong.
 
-1. **Copy production code** from workspace to the main project:
-   - `Claude-Production-Grade-Suite/software-engineer/services/` → project `src/` or `services/`
-   - `Claude-Production-Grade-Suite/frontend-engineer/app/` → project `frontend/` or `web/`
-   - `Claude-Production-Grade-Suite/devops/` → project root (Dockerfiles, CI/CD, terraform/)
-   - Use AskUserQuestion:
-   ```python
-   AskUserQuestion(questions=[{
-     "question": "Code is ready. Integrate into your project root?",
-     "header": "Assembly",
-     "options": [
-       {"label": "Integrate all code (Recommended)", "description": "Copy services, frontend, infra to project root"},
-       {"label": "Keep in workspace only", "description": "Leave everything in Claude-Production-Grade-Suite/"},
-       {"label": "Let me choose what to copy", "description": "Select which components to integrate"},
-       {"label": "Chat about this", "description": "Discuss integration strategy"}
-     ],
-     "multiSelect": false
-   }])
-   ```
+### Quality Bar
+1. No TODOs in production code. No placeholder/stub implementations.
+2. All code must compile/build without errors.
+3. All tests must pass (or failures are documented with reasons).
+4. Security issues above Medium must be fixed, not just documented.
 
-2. **Run final validation:**
-   - `docker-compose up` — full stack starts
-   - `make test` — all tests pass
-   - `terraform validate` — IaC is valid
-   - Health check endpoints respond
+## Partial Execution
 
-3. **Present final summary** to CEO/CTO
+Users can run subsets via `$ARGUMENTS`:
+
+| Command | Phases Run |
+|---------|-----------|
+| `/production-grade just define` | PM + Architect only |
+| `/production-grade just build` | Engineer + QA (requires architecture) |
+| `/production-grade just harden` | Security + Review (requires implementation) |
+| `/production-grade just ship` | DevOps + SRE (requires implementation) |
+| `/production-grade just document` | Technical Writer (requires any prior phase) |
+| `/production-grade skip frontend` | Omit Frontend mode |
+| `/production-grade start from architecture` | Skip PM, start at Architect |
 
 ## Final Summary Template
 
@@ -672,119 +410,31 @@ After all phases complete:
 ╔══════════════════════════════════════════════════════════════╗
 ║                 PRODUCTION GRADE — COMPLETE                  ║
 ╠══════════════════════════════════════════════════════════════╣
-║                                                              ║
 ║  Project: <name>                                             ║
-║  Duration: <time from start to finish>                       ║
+║  Session: ${CLAUDE_SESSION_ID}                               ║
+║  Duration: <time>                                            ║
 ║                                                              ║
-║  ┌─ DEFINE ──────────────────────────────────────────────┐   ║
-║  │ ✓ BRD: <X> user stories, <Y> acceptance criteria      │   ║
-║  │ ✓ Architecture: <pattern>, <N> services                │   ║
-║  │ ✓ Tech Stack: <language>, <framework>, <database>      │   ║
-║  │ ✓ API Contracts: <N> endpoints defined                 │   ║
-║  └───────────────────────────────────────────────────────┘   ║
-║                                                              ║
-║  ┌─ BUILD ───────────────────────────────────────────────┐   ║
-║  │ ✓ Backend: <N> services implemented                    │   ║
-║  │ ✓ Frontend: <N> pages, <N> components (if applicable)  │   ║
-║  │ ✓ Tests: <N> unit, <N> integration, <N> e2e            │   ║
-║  │ ✓ Coverage: <X>%                                       │   ║
-║  └───────────────────────────────────────────────────────┘   ║
-║                                                              ║
-║  ┌─ HARDEN ──────────────────────────────────────────────┐   ║
-║  │ ✓ Security: <N> findings (<N> auto-fixed)              │   ║
-║  │ ✓ Code Review: <N> findings (<N> auto-fixed)           │   ║
-║  │ ✓ Remaining: <N> medium, <N> low (documented)          │   ║
-║  └───────────────────────────────────────────────────────┘   ║
-║                                                              ║
-║  ┌─ SHIP ────────────────────────────────────────────────┐   ║
-║  │ ✓ Terraform: <cloud> validated                         │   ║
-║  │ ✓ CI/CD: <N> pipelines (GitHub Actions)                │   ║
-║  │ ✓ Docker: All images build successfully                │   ║
-║  │ ✓ K8s: Manifests validated                             │   ║
-║  │ ✓ Monitoring: <N> dashboards, <N> alerts               │   ║
-║  │ ✓ SRE: Production readiness approved                   │   ║
-║  └───────────────────────────────────────────────────────┘   ║
-║                                                              ║
-║  ┌─ SUSTAIN ─────────────────────────────────────────────┐   ║
-║  │ ✓ Docs: API reference, dev guides, operational docs    │   ║
-║  │ ✓ Doc site: Docusaurus scaffolded                      │   ║
-║  │ ✓ Custom skills: <N> project-specific skills created   │   ║
-║  └───────────────────────────────────────────────────────┘   ║
+║  DEFINE:  ✓ BRD (<X> stories) ✓ Architecture (<pattern>)     ║
+║  BUILD:   ✓ Backend (<N> services) ✓ Tests (<N> passing)     ║
+║  HARDEN:  ✓ Security (<N> fixed) ✓ Code Review (<N> fixed)   ║
+║  SHIP:    ✓ Docker ✓ CI/CD ✓ Terraform ✓ SRE approved       ║
+║  SUSTAIN: ✓ Docs ✓ Skills (<N> created) ✓ Learnings captured ║
 ║                                                              ║
 ║  Workspace: Claude-Production-Grade-Suite/                   ║
-║                                                              ║
 ╚══════════════════════════════════════════════════════════════╝
 ```
-
-## Context Bridging Rules
-
-Each phase reads from previous phases' workspace folders. No redundant interviews.
-
-| Phase | Reads From | Writes To |
-|-------|-----------|-----------|
-| Product Manager | User interview | `product-manager/` |
-| Solution Architect | `product-manager/BRD/` | `solution-architect/` |
-| Software Engineer | `solution-architect/api/`, `solution-architect/schemas/`, `solution-architect/scaffold/` | `software-engineer/` |
-| Frontend Engineer | `solution-architect/api/`, `product-manager/BRD/` | `frontend-engineer/` |
-| QA Engineer | `software-engineer/`, `frontend-engineer/`, `solution-architect/api/`, `product-manager/BRD/` | `qa-engineer/` |
-| Security Engineer | `software-engineer/`, `frontend-engineer/`, `solution-architect/`, `devops/` | `security-engineer/` |
-| Code Reviewer | `software-engineer/`, `frontend-engineer/`, `qa-engineer/`, `solution-architect/docs/` | `code-reviewer/` |
-| DevOps | `solution-architect/`, `software-engineer/` | `devops/` |
-| SRE | `devops/`, `solution-architect/` | `sre/` |
-| Data Scientist | `software-engineer/`, `solution-architect/`, `product-manager/BRD/` | `data-scientist/` |
-| Technical Writer | ALL workspace folders | `technical-writer/` |
-| Skill Maker | ALL workspace folders | `skill-maker/` |
-
-## Autonomous Agent Behavior Protocol
-
-Every agent in this pipeline follows these rules:
-
-### Build & Verify
-1. After writing code, **run it**. Use `bash` to compile, build, or start services.
-2. After writing tests, **execute them**. Don't assume they pass.
-3. After writing infrastructure, **validate it** (terraform validate, docker build).
-
-### Self-Debug
-1. When something fails, **read the error output**.
-2. Identify the root cause — don't guess.
-3. Fix the issue and retry.
-4. After 3 failed attempts, stop and report to the user with: error message, what you tried, what you think is wrong.
-
-### Self-Coordinate
-1. Always read the workspace before starting — check what previous agents produced.
-2. Write your outputs to your designated folder.
-3. If you depend on another agent's output that doesn't exist yet, note the dependency and inform the orchestrator.
-
-### Quality Bar
-1. No TODOs in production code (only in comments marking future enhancements).
-2. No placeholder/stub implementations — write real code.
-3. All code must compile/build without errors.
-4. All tests must pass (or failures are documented with reasons).
-5. Security issues above Medium must be fixed, not just documented.
-
-## Partial Execution
-
-Users can run subsets of the pipeline:
-
-| Command | Phases Run |
-|---------|-----------|
-| "Just define" | PM → Architect |
-| "Just build" | Engineer → QA (requires architecture) |
-| "Just harden" | Security → Review (requires implementation) |
-| "Just ship" | DevOps → SRE (requires implementation) |
-| "Just document" | Technical Writer (requires any prior phase) |
-| "Skip frontend" | Omit Phase 3b |
-| "Start from architecture" | Skip PM, start at Phase 2 |
 
 ## Common Mistakes
 
 | Mistake | Fix |
 |---------|-----|
-| Running BUILD without DEFINE | Architecture decisions must exist first. No coding without contracts. |
-| Skipping tests because "it's just a prototype" | Production grade means tested. Always run QA phase. |
-| Not running code after writing it | Every agent must verify their output compiles and runs. |
-| Leaving broken code and moving on | Self-debug protocol: fix or clearly report why it can't be fixed. |
-| Copying to main project without validation | Final assembly runs docker-compose and tests before integration. |
-| Agents working in isolation | Cross-reference workspace folders. Read what previous agents produced. |
-| Over-asking the user | Batch questions, use sensible defaults, only ask at the 3 approval gates. |
-| Writing stubs instead of real code | Production grade means real implementations. No `// TODO: implement`. |
+| Running BUILD without DEFINE | Architecture decisions must exist first |
+| Skipping tests | Production grade means tested. Always run QA |
+| Not running code after writing it | Every agent verifies their output compiles and runs |
+| Leaving broken code | Self-debug: fix or clearly report why it cannot be fixed |
+| Agents working in isolation | Cross-reference workspace folders |
+| Over-asking the user | Batch questions, sensible defaults, 3 gates only |
+| Writing stubs instead of real code | No `// TODO: implement` in production code |
+| Writing tests after all code is done | TDD: write test first, then implement |
+| Security only in HARDEN phase | Credential scanning runs continuously |
+| Not capturing learnings | Always run Compound Learning at pipeline end |
