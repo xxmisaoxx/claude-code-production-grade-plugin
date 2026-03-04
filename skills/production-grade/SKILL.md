@@ -21,55 +21,140 @@ Fully autonomous meta-skill orchestrator. The user gives a high-level vision ("B
 
 ## User Experience Protocol
 
-This skill runs as a **fully autonomous, continuous pipeline** in the terminal. The user experience is:
+**CRITICAL: This section defines HOW you interact with the user. Follow it exactly.**
 
-### Continuous Execution
-- Once invoked, work continuously until the task is **fully complete** or the user intercepts with ESC
+This skill runs as a **fully autonomous, continuous pipeline** in the terminal. The user should never need to type — they navigate with arrow keys and press Enter.
+
+### RULE 1: NEVER Ask Open-Ended Questions
+
+**NEVER output text that expects the user to type a response.** Every single user interaction MUST go through the `AskUserQuestion` tool with predefined options. The user navigates with arrow up/down and selects with Enter.
+
+**WRONG — never do this:**
+```
+Do you approve the BRD? Please type yes or no.
+What do you think about the architecture?
+Approve architecture to start autonomous BUILD phase?
+```
+
+**RIGHT — always do this:**
+```python
+AskUserQuestion(questions=[{
+  "question": "BRD is complete (12 user stories, 8 acceptance criteria). Ready to proceed?",
+  "header": "Gate 1",
+  "options": [
+    {"label": "Approve — start architecture (Recommended)", "description": "Lock BRD and proceed to Solution Architect phase"},
+    {"label": "Show me the BRD details", "description": "Display the full BRD document before deciding"},
+    {"label": "I have changes", "description": "Suggest specific modifications to the BRD"},
+    {"label": "Chat about this", "description": "Type free-form input about the requirements"}
+  ],
+  "multiSelect": false
+}])
+```
+
+### RULE 2: Always End Options with "Chat about this"
+
+Every `AskUserQuestion` call MUST have `"Chat about this"` as the **last option**. This is the user's escape hatch to type free-form input when none of the preset options fit.
+
+### RULE 3: Recommended Option First
+
+The first option should always be the recommended/default action with `(Recommended)` in the label. This is what the user will select 80% of the time — make it easy.
+
+### RULE 4: Continuous Execution Between Gates
+
+- Once the user selects an option, **work continuously until the next gate or task completion**
 - Never stop to ask "should I continue?" — just keep going
-- If the user presses ESC, pause gracefully and accept additional input before resuming
+- Print progress constantly (see Progress Format below)
+- If the user presses ESC, pause and accept additional input before resuming
 
-### Real-Time Terminal Updates
-- **Constantly update the user** on what you're doing in the terminal
-- Show progress at every meaningful step: "Setting up project structure...", "Writing API routes...", "Running tests..."
-- After completing a sub-task, give a **one-line status**: "✓ Database schema created (9 tables)"
-- Use clear section headers when transitioning between phases
-- Never go silent for long periods — if a step takes time, say what you're waiting for
+### RULE 5: Real-Time Terminal Updates
 
-### User Input: Multiple Choice Only
-- When user input is needed, **always use AskUserQuestion with predefined options**
-- Users navigate options with **arrow keys (up/down)** and select with Enter
-- **Always include "Chat about this" as the last option** — this lets the user type free-form input instead of picking a preset
-- Keep options to 2-4 choices (plus "Chat about this")
-- Front-load the recommended option first with "(Recommended)" suffix
-- Example:
-  ```
-  Which database should we use?
-  → PostgreSQL (Recommended)
-    MySQL
-    SQLite
-    Chat about this
-  ```
+**Constantly update the user** on what you're doing. Never go silent.
 
-### Progress Format
-Use this format for terminal output:
 ```
 ━━━ Phase N: [Phase Name] ━━━━━━━━━━━━━━━━━━━━━━
-[description of what's happening]
 
-✓ Step completed (details)
-✓ Step completed (details)
-⧖ Working on [current step]...
+⧖ Setting up project structure...
+✓ Project structure created (12 directories)
+⧖ Writing database schema...
+✓ Database schema created (9 tables, 13 migrations)
+⧖ Implementing API routes...
+✓ API routes implemented (17 endpoints)
 
 ━━━ Phase N Complete ━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Summary: [1-2 line summary of what was produced]
+Summary: Backend service with 17 endpoints, 9 DB tables, PayOS integration
 ```
 
-### Autonomy Rules
+### RULE 6: Gate Interactions (Mandatory AskUserQuestion Calls)
+
+These are the EXACT interactions at each gate. Copy these patterns:
+
+**Gate 1 — BRD Approval:**
+```python
+AskUserQuestion(questions=[{
+  "question": "BRD complete: [X] user stories, [Y] acceptance criteria. Approve?",
+  "header": "Gate 1: BRD",
+  "options": [
+    {"label": "Approve — start architecture (Recommended)", "description": "BRD locked, proceed to Solution Architect"},
+    {"label": "Show BRD details", "description": "Display the full BRD before deciding"},
+    {"label": "I have changes", "description": "Request modifications to requirements"},
+    {"label": "Chat about this", "description": "Free-form input about the BRD"}
+  ],
+  "multiSelect": false
+}])
+```
+
+**Gate 2 — Architecture Approval:**
+```python
+AskUserQuestion(questions=[{
+  "question": "Architecture complete: [tech stack summary]. Approve to start building?",
+  "header": "Gate 2: Arch",
+  "options": [
+    {"label": "Approve — start building (Recommended)", "description": "Architecture locked, begin autonomous BUILD phase"},
+    {"label": "Show architecture details", "description": "Walk through ADRs, diagrams, and API spec"},
+    {"label": "I have concerns", "description": "Flag issues with architecture decisions"},
+    {"label": "Chat about this", "description": "Free-form input about the architecture"}
+  ],
+  "multiSelect": false
+}])
+```
+
+**Gate 3 — Production Readiness:**
+```python
+AskUserQuestion(questions=[{
+  "question": "All phases complete. [summary of what was built]. Ship it?",
+  "header": "Gate 3: Ship",
+  "options": [
+    {"label": "Ship it — production ready (Recommended)", "description": "Finalize assembly and deploy"},
+    {"label": "Show full report", "description": "Display complete pipeline summary"},
+    {"label": "Fix issues first", "description": "Address remaining findings before shipping"},
+    {"label": "Chat about this", "description": "Free-form input about production readiness"}
+  ],
+  "multiSelect": false
+}])
+```
+
+**Mid-Phase Decisions (when needed):**
+```python
+AskUserQuestion(questions=[{
+  "question": "[Specific decision needed]?",
+  "header": "[Short label]",
+  "options": [
+    {"label": "[Best option] (Recommended)", "description": "[Why this is recommended]"},
+    {"label": "[Alternative 1]", "description": "[Trade-off explanation]"},
+    {"label": "[Alternative 2]", "description": "[Trade-off explanation]"},
+    {"label": "Chat about this", "description": "Type your own preference"}
+  ],
+  "multiSelect": false
+}])
+```
+
+### RULE 7: Autonomy Between Gates
+
 1. **Default to sensible choices** — don't ask the user for every minor decision
-2. **Only ask at strategic gates** — major architectural decisions, approval checkpoints
-3. **Self-resolve issues** — if something breaks, debug and fix it before bothering the user
-4. **Report, don't ask** — "I chose PostgreSQL because [reason]" is better than "Which database?"
-5. **Batch questions** — if you need multiple inputs, ask them together, not one at a time
+2. **Only use AskUserQuestion at strategic gates** — the 3 gates above + major blockers
+3. **Self-resolve issues** — debug and fix before bothering the user
+4. **Report, don't ask** — "I chose PostgreSQL because [reason]" not "Which database?"
+5. **Batch questions** — use `multiSelect: true` or multiple questions in one AskUserQuestion call
 
 ## Workspace Architecture
 
