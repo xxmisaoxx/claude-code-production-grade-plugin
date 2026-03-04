@@ -1,0 +1,10 @@
+{
+  "name": "production-grade",
+  "description": "Meta-skill orchestrator: runs Product Manager → Solution Architect → DevOps pipeline to build complete production-ready SaaS from idea to deployment infrastructure",
+  "version": "1.0.0",
+  "author": {
+    "name": "nagisanzenin"
+  },
+  "license": "MIT",
+  "keywords": ["production-grade", "saas", "orchestrator", "full-stack", "meta-skill", "pipeline"]
+}
