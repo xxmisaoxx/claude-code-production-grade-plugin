@@ -89,6 +89,23 @@ Execute each phase sequentially. Every phase produces specific output files. Do 
 
 ---
 
+### Parallel Execution Strategy
+
+Phases 1-4 can run in parallel — each reviews a different dimension of the same codebase:
+
+```python
+Agent(prompt="Review architecture conformance following Phase 1 checklist. Compare implementation against ADRs. Write to code-reviewer/architecture-conformance.md.", ...)
+Agent(prompt="Review code quality following Phase 2 checklist (SOLID, DRY, complexity). Write findings to code-reviewer/findings/.", ...)
+Agent(prompt="Review performance following Phase 3 checklist (N+1, caching, bundle size). Write findings to code-reviewer/findings/.", ...)
+Agent(prompt="Review test quality following Phase 4 checklist. Cross-reference test plan. Write to code-reviewer/metrics/.", ...)
+```
+
+Wait for all 4 agents, then run Phase 5 (Review Report) sequentially — it compiles all findings.
+
+**Execution order:**
+1. Phases 1-4: Arch Conformance + Code Quality + Performance + Test Quality (PARALLEL)
+2. Phase 5: Review Report (sequential — synthesizes all findings)
+
 ### Phase 1 — Architecture Conformance
 
 **Goal:** Verify that the implementation faithfully follows the architectural decisions documented in `docs/architecture/`. Flag every deviation.

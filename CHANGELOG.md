@@ -2,6 +2,17 @@
 
 All notable changes to the Production Grade Plugin.
 
+## [4.0.0] — 2026-03-05
+
+### Changed
+- **Two-wave parallel execution** — orchestrator splits work into Wave A (build + analysis in parallel) and Wave B (execution against code in parallel). Analysis tasks (QA test plan, STRIDE threat model, SLO definitions, arch conformance checklist) start alongside build instead of waiting for code. Up to 7+ concurrent agents in Wave A, 4+ in Wave B.
+- **Internal skill parallelism** — 8 skills now spawn parallel Agents for independent work units: software-engineer (1 agent per service), frontend-engineer (1 agent per page group), qa-engineer (unit/integration/e2e/performance in parallel), security-engineer (code audit/auth/data/supply chain in parallel), code-reviewer (arch/quality/performance in parallel), devops (IaC/CI-CD/containers in parallel), sre (chaos/incidents/capacity in parallel), technical-writer (API ref/dev guides in parallel).
+- **Dynamic task generation** — orchestrator reads architecture output (number of services, pages, modules) and creates tasks accordingly. No hardcoded task count.
+
+### Added
+- **Parallelism preference** — user selects performance mode at pipeline start: Maximum (recommended), Standard, or Sequential. No config file needed.
+- **Token economics** — parallel execution is both faster AND cheaper. Each agent carries minimal context instead of accumulating prior work. ~45% fewer total input tokens for 3+ services.
+
 ## [3.3.0] — 2026-03-05
 
 ### Added

@@ -57,12 +57,42 @@ This skill runs as Phase 3b in the production-grade pipeline, in parallel with S
 
 Read the relevant phase file before starting that phase. Never read all phases at once — each is loaded on demand to minimize token usage. After completing a phase, proceed to the next by loading its file.
 
+## Parallel Execution
+
+When the BRD defines multiple page groups, Phase 3 (Components) and Phase 4 (Pages) run with internal parallelism.
+
+**How it works:**
+
+1. Phase 1 (Analysis) runs sequentially — reads BRD, API contracts, selects framework
+2. Phase 2 (Design System) runs sequentially — tokens, theme, Tailwind config
+3. At Phase 3, identify independent component groups (ui primitives, layout, feature components) and build in parallel:
+
+```python
+Agent(prompt="Build UI primitive components (Button, Input, Select, Modal, etc.) following phases/03-components.md. Write to frontend/app/components/ui/.", ...)
+Agent(prompt="Build layout components (Sidebar, Header, PageLayout, etc.) following phases/03-components.md. Write to frontend/app/components/layout/.", ...)
+Agent(prompt="Build feature components (DataTable, FileUpload, RichEditor, etc.) following phases/03-components.md. Write to frontend/app/components/features/.", ...)
+```
+
+4. At Phase 4, group pages by route domain and build in parallel:
+
+```python
+# Example: BRD defines auth pages, dashboard, settings, onboarding
+Agent(prompt="Build auth pages (login, register, forgot-password). Write to frontend/app/pages/auth/.", ...)
+Agent(prompt="Build dashboard pages (overview, analytics, activity). Write to frontend/app/pages/dashboard/.", ...)
+Agent(prompt="Build settings pages (profile, billing, team, integrations). Write to frontend/app/pages/settings/.", ...)
+```
+
+5. Phase 5 (Testing + A11y) runs sequentially — needs all components and pages
+
+**Token savings:** Pages are independent — each agent carries only design system context + its page-specific BRD stories, not the full accumulated frontend codebase.
+
 ## Process Flow
 
 ```
-Triggered -> Phase 1: UI/UX Analysis -> Phase 2: Design System -> User Review 1
-  -> Phase 3: Component Library -> Phase 4: Page Implementation -> User Review 2
-  -> Phase 5: Performance & A11y -> Suite Complete
+Triggered -> Phase 1: UI/UX Analysis -> Phase 2: Design System
+  -> Phase 3: Components (PARALLEL: ui / layout / features)
+  -> Phase 4: Pages (PARALLEL: 1 Agent per route group)
+  -> Phase 5: Testing + A11y -> Suite Complete
 ```
 
 ## Output Contract

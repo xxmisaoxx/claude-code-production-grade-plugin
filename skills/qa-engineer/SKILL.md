@@ -148,6 +148,28 @@ Claude-Production-Grade-Suite/qa-engineer/
 
 Execute each phase sequentially. Do NOT skip phases. Each phase builds on the outputs of the previous one.
 
+### Parallel Execution Strategy
+
+After Phase 1 (Test Planning), Phases 2-6 run in parallel — each test type is independent:
+
+```python
+# After test plan is written, spawn all test types simultaneously:
+Agent(prompt="Write unit tests following Phase 2 rules. Read test-plan.md for traceability. Write to tests/unit/.", ...)
+Agent(prompt="Write integration tests following Phase 3 rules. Read test-plan.md. Write to tests/integration/.", ...)
+Agent(prompt="Write contract tests following Phase 4 rules. Read test-plan.md. Write to tests/contract/.", ...)
+Agent(prompt="Write E2E tests following Phase 5 rules. Read test-plan.md. Write to tests/e2e/.", ...)
+Agent(prompt="Write performance tests following Phase 6 rules. Read test-plan.md. Write to tests/performance/.", ...)
+```
+
+Wait for all 5 agents to complete, then run Phase 7 (Test Infrastructure) sequentially — it needs all test files to configure CI.
+
+**Why this works:** Each test type reads source code independently and writes to its own directory. No conflicts. The test plan from Phase 1 provides shared context.
+
+**Execution order:**
+1. Phase 1: Test Planning (sequential — foundational)
+2. Phases 2-6: Unit + Integration + Contract + E2E + Performance (PARALLEL)
+3. Phase 7: Test Infrastructure (sequential — needs all test files)
+
 ---
 
 ### Phase 1 — Test Planning

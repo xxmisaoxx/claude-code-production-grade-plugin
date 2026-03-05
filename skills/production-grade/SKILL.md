@@ -19,7 +19,7 @@ description: >
 
 ## Overview
 
-Fully autonomous meta-skill orchestrator using Claude Code **Teams** and **TaskList** for native pipeline state management. The user gives a high-level vision; this skill runs the DEFINE → BUILD → HARDEN → SHIP → SUSTAIN pipeline with 13 coordinated tasks and 7 parallel execution points.
+Fully autonomous meta-skill orchestrator using Claude Code **Teams** and **TaskList** for native pipeline state management. The user gives a high-level vision; this skill runs the DEFINE → BUILD → HARDEN → SHIP → SUSTAIN pipeline with dynamic task generation, two-wave parallel execution, and internal skill parallelism — pushing Claude Code's concurrency to maximum throughput with lower total token cost than sequential execution.
 
 **All skills are bundled in this plugin. Single install, everything included.**
 
@@ -168,9 +168,26 @@ Read these from the plugin's `skills/_shared/protocols/` directory and copy them
 
    All agents read this file before executing. It overrides default "create from scratch" behavior.
 
-5. **Detect existing workspace** — if `Claude-Production-Grade-Suite/.orchestrator/` has prior state, offer to resume or restart via AskUserQuestion.
+5. **Parallelism preference:**
 
-6. **Polymath pre-flight check:**
+```python
+AskUserQuestion(questions=[{
+  "question": "How should the pipeline parallelize work?",
+  "header": "Performance Mode",
+  "options": [
+    {"label": "Maximum parallelism (Recommended)", "description": "Fastest execution, lowest total token cost. Spawns up to 7+ concurrent agents. Best for most projects."},
+    {"label": "Standard", "description": "2-3 concurrent agents. Slower but lighter on system resources."},
+    {"label": "Sequential", "description": "One agent at a time. Use for debugging or when inspecting each step."}
+  ],
+  "multiSelect": false
+}])
+```
+
+Store the choice. Maximum is the recommended default — parallel execution is both faster AND cheaper in total tokens because each agent carries minimal context instead of accumulating prior work.
+
+6. **Detect existing workspace** — if `Claude-Production-Grade-Suite/.orchestrator/` has prior state, offer to resume or restart via AskUserQuestion.
+
+7. **Polymath pre-flight check:**
    - If `Claude-Production-Grade-Suite/polymath/handoff/context-package.md` exists → read it, pass to PM as pre-loaded context. Log: `✓ Polymath context loaded — skipping redundant discovery`
    - If no polymath context, assess the user's request for knowledge gaps:
      - **Vague scope** (no specific problem domain), **no constraints** (scale, budget, team), **complex domain with no domain language**, **contradictory signals**
@@ -178,15 +195,15 @@ Read these from the plugin's `skills/_shared/protocols/` directory and copy them
      - If no gaps → proceed directly. Log: `✓ Request is clear — proceeding to PM`
    - If user explicitly requests to skip polymath ("just build it", clear detailed spec) → proceed immediately.
 
-7. **Research the domain** — use WebSearch before asking the user anything (skip if polymath already researched).
+8. **Research the domain** — use WebSearch before asking the user anything (skip if polymath already researched).
 
-8. **Create team and task graph:**
+9. **Create team and task graph:**
 ```python
 TeamCreate(team_name="production-grade")
 ```
 Create all 13 tasks with dependencies (see Task Dependency Graph). Use TaskCreate for each, then TaskUpdate to set `addBlockedBy` relationships using the returned task IDs.
 
-9. **Begin Phase 1** — read `phases/define.md` and start immediately. Do NOT ask "should I proceed?"
+10. **Begin Phase 1** — read `phases/define.md` and start immediately. Do NOT ask "should I proceed?"
 
 **Key principle:** The user already told you what to build. Research, plan, start building. Only pause at the 3 approval gates.
 
@@ -260,57 +277,117 @@ AskUserQuestion(questions=[{
 }])
 ```
 
-## Task Dependency Graph
+## Task Dependency Graph — Two-Wave Parallel Execution
 
-13 tasks, 7 parallel execution points:
+Dynamic task generation with two-wave parallelism. The orchestrator reads the architecture output (number of services, pages, modules) and generates tasks accordingly — one Agent per work unit.
+
+**Maximum parallelism mode (default):**
 
 ```
 T1: product-manager (BRD)
     ↓ [GATE 1]
 T2: solution-architect (Architecture)
     ↓ [GATE 2]
-T3a: software-engineer (Backend) ─────┐
-T3b: frontend-engineer (Frontend) ────┘ ← PARALLEL #1
-    ↓ (T4 starts when T3a done)
-T4: devops (Containerization) ─────────── PARALLEL #2 (runs while T3b may still be going)
-    ↓ (all BUILD done)
-T5: qa-engineer (Testing) ────────────┐
-T6a: security-engineer (Audit) ───────┤ ← PARALLEL #3
-T6b: code-reviewer (Quality) ─────────┘ ← PARALLEL #4 (no OWASP)
+    ↓ parallelism preference
+┌────────────── WAVE A: BUILD + ANALYSIS (all parallel) ──────────────┐
+│                                                                      │
+│  BUILD (needs architecture):                                         │
+│    T3a: software-engineer ──── spawns N agents (1 per service)       │
+│    T3b: frontend-engineer ──── spawns N agents (1 per page group)    │
+│                                                                      │
+│  ANALYSIS (needs architecture only, starts alongside build):         │
+│    T4a: devops — Dockerfiles + CI skeleton                           │
+│    T5a: qa-engineer — test plan + test scaffolds                     │
+│    T6a: security-engineer — STRIDE threat model                      │
+│    T6b: code-reviewer — arch conformance + review checklist          │
+│    T9a: sre — SLO definitions + alert rules                         │
+│                                                                      │
+│  Up to 7+ concurrent agents in Wave A                                │
+└──────────────────────────────────────────────────────────────────────┘
+    ↓ (wait for T3a + T3b code to be written)
+┌────────────── WAVE B: EXECUTION against code (all parallel) ────────┐
+│                                                                      │
+│    T4b: devops — build + push containers                             │
+│    T5b: qa-engineer — implement tests (spawns N: unit/integ/e2e/perf)│
+│    T6c: security-engineer — code audit + dep scan (spawns N phases)  │
+│    T6d: code-reviewer — actual review (spawns N: arch/quality/perf)  │
+│                                                                      │
+│  Up to 4 concurrent agents, each spawning 3-4 internal agents        │
+└──────────────────────────────────────────────────────────────────────┘
     ↓
-T7: devops (IaC + CI/CD) ────────────┐
-T8: Remediation (HARDEN fixes) ──────┘ ← PARALLEL #5
+T7: devops (IaC + CI/CD) ──────────┐
+T8: remediation (HARDEN fixes) ────┘ PARALLEL
     ↓
-T9: sre (Production Readiness) ──────┐
-T10: data-scientist (conditional) ───┘ ← PARALLEL #6
+T9b: sre (chaos + capacity) ──────┐
+T10: data-scientist (conditional) ─┘ PARALLEL
     ↓ [GATE 3]
-T11: technical-writer (Docs) ────────┐
-T12: skill-maker (Custom Skills) ────┘ ← PARALLEL #7
+T11: technical-writer (spawns N: API ref / dev guide / ops guide) ──┐
+T12: skill-maker ──────────────────────────────────────────────────┘ PARALLEL
     ↓
 T13: Compound Learning + Assembly
 ```
 
-### Task Dependencies
+**Standard mode:** Collapses waves — Wave A runs build only, Wave B runs all harden sequentially. No internal skill parallelism.
+
+**Sequential mode:** One task at a time. Original 13-task serial execution.
+
+### Task Dependencies (Maximum Parallelism)
 
 Create tasks with TaskCreate, then set dependencies with TaskUpdate using the returned IDs.
+
+**Wave A tasks** — all depend on T2 (architecture), no dependencies on each other:
 
 | Task | Blocked By | Notes |
 |------|-----------|-------|
 | T1 | — | First task, no blockers |
 | T2 | T1 | Needs BRD |
-| T3a | T2 | Needs architecture |
-| T3b | T2 | Needs architecture |
-| T4 | T3a | Starts when backend done (not frontend) |
-| T5 | T3a, T3b, T4 | Needs all BUILD output |
-| T6a | T3a, T3b, T4 | Needs all BUILD output |
-| T6b | T3a, T3b, T4 | Needs all BUILD output |
-| T7 | T5, T6a, T6b | Needs HARDEN output |
-| T8 | T5, T6a, T6b | Needs HARDEN findings |
-| T9 | T7, T8 | Needs IaC + remediation |
+| T3a | T2 | Backend — spawns 1 Agent per service from architecture |
+| T3b | T2 | Frontend — spawns 1 Agent per page group from BRD |
+| T4a | T2 | DevOps analysis — Dockerfiles + CI skeleton |
+| T5a | T2 | QA test plan — from BRD + architecture |
+| T6a | T2 | Security threat model — STRIDE from architecture |
+| T6b | T2 | Review prep — arch conformance checklist |
+| T9a | T2 | SRE — SLO definitions from architecture + monitoring |
+
+**Wave B tasks** — depend on T3a/T3b (code) + their Wave A analysis:
+
+| Task | Blocked By | Notes |
+|------|-----------|-------|
+| T4b | T3a, T4a | Build containers — needs code + Dockerfiles |
+| T5b | T3a, T3b, T5a | Implement tests — needs code + test plan |
+| T6c | T3a, T3b, T6a | Code audit — needs code + threat model |
+| T6d | T3a, T3b, T6b | Code review — needs code + checklist |
+
+**Post-wave tasks:**
+
+| Task | Blocked By | Notes |
+|------|-----------|-------|
+| T7 | T5b, T6c, T6d | IaC + CI/CD — needs HARDEN output |
+| T8 | T5b, T6c, T6d | Remediation — needs HARDEN findings |
+| T9b | T7, T8, T9a | SRE execution — needs infra + SLO defs |
 | T10 | T7, T8 | Conditional on AI/ML usage |
-| T11 | T9 | Needs all prior output |
-| T12 | T9 | Needs all prior output |
+| T11 | T9b | Docs — needs all prior output |
+| T12 | T9b | Skills — needs all prior output |
 | T13 | T11, T12 | Final step |
+
+### Dynamic Task Generation
+
+After Gate 2 (architecture approved), the orchestrator reads the architecture output to determine work units:
+
+1. **Count services** — Read `docs/architecture/` service list or `api/` specs. For each service, create a subtask under T3a.
+2. **Count pages** — Read BRD user stories. Group into page clusters (auth, dashboard, settings, etc.). For each group, create a subtask under T3b.
+3. **Generate Wave A TaskList** — All T3a subtasks + T3b subtasks + T4a + T5a + T6a + T6b + T9a. No cross-dependencies.
+4. **On Wave A completion** — Generate Wave B TaskList with dependencies on Wave A outputs.
+
+Each subtask is dispatched as:
+```python
+Agent(
+  prompt="You are the Software Engineer. Implement the {service_name} service. Read architecture at docs/architecture/ and API contract at api/openapi/{service}.yaml. Follow skills/software-engineer/phases/02-service-implementation.md. Write output to services/{service_name}/.",
+  subagent_type="general-purpose",
+  mode="bypassPermissions",
+  run_in_background=True
+)
+```
 
 ### Conditional Tasks
 
@@ -321,13 +398,26 @@ Create tasks with TaskCreate, then set dependencies with TaskUpdate using the re
 
 Each phase loads its dispatcher file for task management and agent spawning.
 
-| Phase | File | Tasks | Parallel Points |
-|-------|------|-------|----------------|
+| Phase | File | Tasks | Parallel Strategy |
+|-------|------|-------|-------------------|
 | DEFINE | `phases/define.md` | T1, T2 | Sequential (gates) |
-| BUILD | `phases/build.md` | T3a, T3b, T4 | #1, #2 |
-| HARDEN | `phases/harden.md` | T5, T6a, T6b | #3, #4 |
-| SHIP | `phases/ship.md` | T7, T8, T9, T10 | #5, #6 |
-| SUSTAIN | `phases/sustain.md` | T11, T12, T13 | #7 |
+| BUILD + ANALYSIS | `phases/build.md` | T3a, T3b, T4a, T5a, T6a, T6b, T9a | Wave A: all 7 parallel, skills spawn internal agents |
+| HARDEN | `phases/harden.md` | T4b, T5b, T6c, T6d | Wave B: all 4 parallel, skills spawn internal agents |
+| SHIP | `phases/ship.md` | T7, T8, T9b, T10 | #5, #6 parallel pairs |
+| SUSTAIN | `phases/sustain.md` | T11, T12, T13 | #7 parallel + internal |
+
+**Internal skill parallelism** — each skill spawns its own concurrent agents:
+
+| Skill | What Parallelizes Internally |
+|-------|------------------------------|
+| software-engineer | 1 Agent per service (Phase 2: implementation) |
+| frontend-engineer | 1 Agent per page group (Phase 4: pages) |
+| qa-engineer | 4 parallel Agents: unit, integration, e2e, performance tests |
+| security-engineer | 4 parallel Agents: code audit, auth review, data security, supply chain |
+| code-reviewer | 3 parallel Agents: arch conformance, code quality, performance review |
+| devops | 3 parallel Agents: IaC, CI/CD, container orchestration |
+| sre | 3 parallel Agents: chaos engineering, incident management, capacity planning |
+| technical-writer | 2 parallel Agents: API reference, developer guides |
 
 **Read the phase file BEFORE starting that phase. Never load all phase files at once.**
 
@@ -486,5 +576,5 @@ Every agent follows:
 | Over-asking the user | 3 gates only — sensible defaults otherwise |
 | Writing stubs | No `// TODO: implement` in production code |
 | Hardcoded paths | Read `.production-grade.yaml` for path overrides |
-| Sequential when parallel possible | Use all 7 parallel points in task graph |
+| Sequential when parallel possible | Maximum parallelism: two-wave execution + internal skill agents. Every independent unit gets its own agent |
 | Duplicating security review | code-reviewer references security-engineer findings |

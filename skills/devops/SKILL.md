@@ -49,6 +49,28 @@ Read `.production-grade.yaml` at startup. Use these overrides if defined:
 - Multi-cloud or hybrid-cloud deployment planning
 - Production readiness review and hardening
 
+## Parallel Execution
+
+After Phase 1 (Assessment), Phases 2-4 and Phases 5-6 can run as two parallel groups:
+
+**Group 1 (infrastructure artifacts — independent):**
+```python
+Agent(prompt="Generate Terraform IaC following Phase 2. Write to infrastructure/terraform/.", ...)
+Agent(prompt="Generate CI/CD pipelines following Phase 3. Write to .github/workflows/ and scripts/.", ...)
+Agent(prompt="Generate container orchestration following Phase 4. Write Dockerfiles and K8s manifests.", ...)
+```
+
+**Group 2 (after Group 1 — needs infrastructure context):**
+```python
+Agent(prompt="Generate monitoring + observability following Phase 5. Write to infrastructure/monitoring/.", ...)
+Agent(prompt="Generate security infrastructure following Phase 6. Write to infrastructure/security/.", ...)
+```
+
+**Execution order:**
+1. Phase 1: Assessment (sequential)
+2. Phases 2-4: IaC + CI/CD + Containers (PARALLEL)
+3. Phases 5-6: Monitoring + Security (PARALLEL, after Group 1)
+
 ## Process Flow
 
 ```dot

@@ -60,12 +60,42 @@ This skill reads from `api/`, `schemas/`, and `docs/architecture/` and produces 
 
 Read the relevant phase file before starting that phase. Never read all phases at once — each is loaded on demand to minimize token usage. After completing a phase, proceed to the next by loading its file.
 
+## Parallel Execution
+
+When the architecture defines multiple services, Phase 2 (Service Implementation) runs in parallel — one Agent per service.
+
+**How it works:**
+
+1. Phase 1 (Context Analysis) runs sequentially — reads all architecture contracts, creates implementation plan
+2. At Phase 2, read the architecture output to identify all services (from `api/openapi/` specs or `docs/architecture/` service list)
+3. For each service, spawn a parallel Agent:
+
+```python
+# Example: architecture defines user-service, payment-service, notification-service
+Agent(
+  prompt="You are the Software Engineer. Implement the {service_name} service. Read architecture at docs/architecture/ and API contract at api/openapi/{service}.yaml. Follow the implementation patterns in skills/software-engineer/phases/02-service-implementation.md. Write output to services/{service_name}/.",
+  subagent_type="general-purpose",
+  mode="bypassPermissions",
+  run_in_background=True  # all services build simultaneously
+)
+```
+
+4. Wait for all service agents to complete
+5. Phase 3 (Cross-Cutting Concerns) runs sequentially — spans all services
+6. Phase 4 (Integration) runs sequentially — wires services together
+7. Phase 5 (Local Dev) runs sequentially — docker-compose needs all services
+
+**Token savings:** 3 services sequentially = ~44K input tokens (context accumulates). 3 services in parallel = ~24K input tokens (each agent starts clean). Parallel is both faster AND cheaper.
+
+**Fallback:** If only 1 service exists, skip parallel dispatch and run Phase 2 directly.
+
 ## Process Flow
 
 ```
-Triggered -> Phase 1: Context Analysis -> Implementation Plan (approval gate)
-  -> Phase 2: Service Implementation -> Code Review Gate
-  -> Phase 3: Cross-Cutting Concerns -> Phase 4: Integration Layer -> Integration Review Gate
+Triggered -> Phase 1: Context Analysis -> Implementation Plan
+  -> Phase 2: Service Implementation (PARALLEL: 1 Agent per service)
+  -> Phase 3: Cross-Cutting Concerns (sequential, spans all services)
+  -> Phase 4: Integration Layer (sequential, wires services)
   -> Phase 5: Local Dev Environment -> Suite Complete
 ```
 

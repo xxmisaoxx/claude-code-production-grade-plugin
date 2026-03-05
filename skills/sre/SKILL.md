@@ -70,6 +70,21 @@ You are the **SRE (Site Reliability Engineering) Specialist**. SOLE authority on
 
 Read the relevant phase file before starting that phase. Never read all phases at once — each is loaded on demand to minimize token usage. Execute phases sequentially. Each phase builds on the previous. If a phase reveals issues, document them in `production-readiness/findings.md` and continue — do not block on remediation.
 
+## Parallel Execution
+
+After Phase 1 (Readiness Review) and Phase 2 (SLO Definition), Phases 3-5 run in parallel:
+
+```python
+Agent(prompt="Design chaos engineering scenarios following Phase 3. Write to sre/chaos/.", ...)
+Agent(prompt="Define incident management procedures following Phase 4. Write to sre/incidents/ and docs/runbooks/.", ...)
+Agent(prompt="Create capacity planning models following Phase 5. Write to sre/capacity/.", ...)
+```
+
+**Execution order:**
+1. Phase 1: Readiness Review (sequential — foundational assessment)
+2. Phase 2: SLO Definition (sequential — all other phases reference SLOs)
+3. Phases 3-5: Chaos + Incidents + Capacity (PARALLEL)
+
 ## Output Structure
 
 ### Project Root (Deliverables)

@@ -2,15 +2,15 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/nagisanzenin/claude-code-production-grade-plugin?style=social)](https://github.com/nagisanzenin/claude-code-production-grade-plugin)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-3.3.0-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-4.0.0-blue.svg)]()
 [![Skills](https://img.shields.io/badge/skills-14-green.svg)]()
-[![Parallel Points](https://img.shields.io/badge/parallel%20points-7-orange.svg)]()
+[![Parallel Points](https://img.shields.io/badge/parallel%20points-10+-orange.svg)]()
 
 **From "I have an idea" to production-ready SaaS. One prompt. Zero hand-holding.**
 
 Most AI coding tools generate files. This one builds *systems* — architecture, tests, security audits, infrastructure, monitoring, documentation — with a co-pilot that thinks with you before a single line of code is written.
 
-> **v3.3** — 14 skills. Polymath co-pilot. 7 parallel execution points. Brownfield-safe. Auto-update with consent. MECE intent routing. Works on greenfield and existing projects.
+> **v4.0** — 14 skills. Two-wave parallel execution. Internal skill parallelism. Dynamic task generation. ~3x faster, ~45% fewer tokens. Polymath co-pilot. Brownfield-safe. Works on greenfield and existing projects.
 
 ### Quick Start
 
@@ -40,12 +40,13 @@ The result: you describe what you want in plain language. 14 specialized agents 
 | Metric | Detail |
 |--------|--------|
 | **14 specialized agents** | Each with sole authority over its domain — no overlap, no contradiction |
-| **7 parallel execution points** | Backend + frontend, containers, QA + security + review, IaC + remediation, SRE + data science, docs + skills |
+| **10+ parallel execution points** | Two-wave orchestration + internal skill parallelism |
 | **3 approval gates** | Everything between gates is fully autonomous |
-| **4 shared protocols** | UX, input validation, tool efficiency, conflict resolution — enforced across all agents |
+| **~3x faster execution** | Two-wave parallel: analysis starts alongside build, not after |
+| **~45% fewer total tokens** | Parallel agents carry minimal context vs. sequential accumulation |
+| **Dynamic task generation** | Orchestrator reads architecture output, spawns 1 agent per service/page |
+| **4 shared protocols** | UX, input validation, tool efficiency, conflict resolution |
 | **6 Polymath modes** | Onboard, research, ideate, advise, translate, synthesize |
-| **5 pipeline phases** | DEFINE, BUILD, HARDEN, SHIP, SUSTAIN |
-| **65% token savings** | Router + on-demand phase loading vs. monolithic skill files |
 | **0 open-ended questions** | Every user interaction is structured: arrow keys + Enter |
 
 ### What Makes This Unique
@@ -89,28 +90,37 @@ You give a high-level vision. 14 specialized agents handle everything else.
 ```
 Polymath (pre-flight: research, gap detection, context building)
     ↓
-T1: Product Manager (BRD) ─────────── GATE 1: approve requirements
-T2: Solution Architect ─────────────── GATE 2: approve architecture
+T1: Product Manager (BRD) ──────────────── GATE 1: approve requirements
+T2: Solution Architect ─────────────────── GATE 2: approve architecture
     ↓
-T3a: Backend Engineer  ──┐
-T3b: Frontend Engineer ──┘ PARALLEL    ← build simultaneously
-T4:  DevOps (containers) ──────────── starts when backend done
+┌── WAVE A: BUILD + ANALYSIS (all parallel) ──────────────────────┐
+│  T3a: Backend ────── spawns N agents (1 per service)            │
+│  T3b: Frontend ───── spawns N agents (1 per page group)         │
+│  T4a: DevOps ─────── Dockerfiles + CI skeleton                  │
+│  T5a: QA ─────────── test plan from BRD + architecture          │
+│  T6a: Security ───── STRIDE threat model                        │
+│  T6b: Code Review ── arch conformance checklist                 │
+│  T9a: SRE ────────── SLO definitions                            │
+└─────────────────────────────────────────────────────────────────┘
+    ↓ (code written)
+┌── WAVE B: EXECUTION against code (all parallel) ───────────────┐
+│  T4b: DevOps ─────── build + push containers                    │
+│  T5b: QA ─────────── implement tests (parallel: unit/e2e/perf)  │
+│  T6c: Security ───── code audit + dep scan (parallel phases)    │
+│  T6d: Code Review ── actual review (parallel: arch/quality/perf)│
+└─────────────────────────────────────────────────────────────────┘
     ↓
-T5:  QA Engineer ────────┐
-T6a: Security Engineer ──┤ PARALLEL    ← test + audit simultaneously
-T6b: Code Reviewer ──────┘
-    ↓
-T7:  DevOps (IaC + CI/CD) ──┐
-T8:  Remediation ────────────┘ PARALLEL ← fix findings + build infra
-T9:  SRE ────────────────────┐
-T10: Data Scientist ─────────┘ PARALLEL ← conditional on AI/ML usage
-    ↓ ──────────────────────── GATE 3: approve production readiness
-T11: Technical Writer ──┐
-T12: Skill Maker ───────┘ PARALLEL     ← docs + custom skills
+T7: DevOps (IaC + CI/CD) ──┐
+T8: Remediation ────────────┘ PARALLEL
+T9b: SRE (chaos + capacity) ┐
+T10: Data Scientist ─────────┘ PARALLEL
+    ↓ ─────────────────────────── GATE 3: approve production readiness
+T11: Technical Writer (parallel: API ref + dev guides) ──┐
+T12: Skill Maker ────────────────────────────────────────┘ PARALLEL
 T13: Compound Learning
 ```
 
-**3 approval gates. 7 parallel execution points. Everything else is autonomous.**
+**3 approval gates. Two-wave execution. Internal skill parallelism. Maximum concurrency.**
 
 ### Interaction Model
 
@@ -146,7 +156,7 @@ You never need to type. Arrow keys + Enter for every decision.
 
 ### Token-Efficient Architecture
 
-Large skills use a router + on-demand phase pattern. Only the relevant phase loads — not the entire skill.
+Large skills use a router + on-demand phase pattern with internal parallelism. Only the relevant phase loads — and independent phases run as parallel Agents, each carrying minimal context.
 
 | Skill | Phases |
 |-------|--------|
@@ -313,6 +323,8 @@ Native Claude Code Teams/TaskList. No custom state files.
 ## Release Timeline
 
 ```
+    v4.0  ●━━━ Two-wave parallelism, internal skill agents, dynamic task generation
+          │
     v3.3  ●━━━ Brownfield-safe — works on existing codebases
           │
     v3.2  ●━━━ Auto-update, MECE intent routing, protocol crash fix

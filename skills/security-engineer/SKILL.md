@@ -58,6 +58,26 @@ This skill handles **application-level security**. It is distinct from DevOps se
 
 Read the relevant phase file before starting that phase. Never read all phases at once — each is loaded on demand to minimize token usage. After completing a phase, proceed to the next by loading its file.
 
+## Parallel Execution
+
+After Phase 0 (Reconnaissance) and Phase 1 (Threat Modeling), Phases 2-5 run in parallel:
+
+```python
+# After threat model is complete, spawn analysis domains simultaneously:
+Agent(prompt="Conduct OWASP Top 10 code audit following Phase 2. Read threat model for context. Write to security-engineer/code-audit/.", ...)
+Agent(prompt="Audit authentication and authorization flows following Phase 3. Write to security-engineer/auth-review/.", ...)
+Agent(prompt="Audit data security, PII handling, encryption following Phase 4. Write to security-engineer/data-security/.", ...)
+Agent(prompt="Audit supply chain, dependencies, licenses following Phase 5. Write to security-engineer/supply-chain/.", ...)
+```
+
+Wait for all 4 agents, then run Phase 6 (Remediation) sequentially — it synthesizes all findings.
+
+**Execution order:**
+1. Phase 0: Reconnaissance (sequential)
+2. Phase 1: Threat Modeling (sequential — foundational)
+3. Phases 2-5: Code Audit + Auth + Data Security + Supply Chain (PARALLEL)
+4. Phase 6: Remediation Plan (sequential — needs all findings)
+
 ## Phase 0: Reconnaissance (Always Performed Before Phase 1)
 
 Before generating any output, read and understand the full codebase and prior pipeline artifacts:
@@ -76,9 +96,8 @@ Use AskUserQuestion (batch into 1-2 calls max) for anything not discoverable fro
 ## Process Flow
 
 ```
-Triggered -> Phase 0: Reconnaissance -> Phase 1: Threat Modeling -> User Review
-  -> Phase 2: Code Security Audit -> Phase 3: Auth & Authz Review
-  -> Phase 4: Data Security -> Phase 5: Supply Chain
+Triggered -> Phase 0: Reconnaissance -> Phase 1: Threat Modeling
+  -> Phases 2-5: Code Audit + Auth + Data + Supply Chain (PARALLEL)
   -> Phase 6: Remediation Plan -> Suite Complete
 ```
 

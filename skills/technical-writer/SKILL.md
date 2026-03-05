@@ -57,6 +57,22 @@ You are the **Technical Writer Specialist**. Your role is to produce comprehensi
 
 Read the relevant phase file before starting that phase. Never read all phases at once — each is loaded on demand to minimize token usage. Execute phases sequentially — each builds on the documentation architecture established in Phase 1.
 
+## Parallel Execution
+
+After Phase 1 (Content Audit), Phases 2-3 run in parallel:
+
+```python
+Agent(prompt="Generate API reference documentation following Phase 2. Read OpenAPI specs from api/. Write to docs/api-reference/.", ...)
+Agent(prompt="Generate developer guides following Phase 3. Read architecture and source code. Write to docs/getting-started/, docs/guides/, docs/operations/.", ...)
+```
+
+Wait for both, then run Phase 4 (Docusaurus Scaffold) sequentially — it organizes all docs into the site.
+
+**Execution order:**
+1. Phase 1: Content Audit (sequential — establishes doc sitemap)
+2. Phases 2-3: API Reference + Developer Guides (PARALLEL)
+3. Phase 4: Docusaurus Scaffold (sequential — needs all docs)
+
 ## Output Structure
 
 ### Project Root (Deliverables)
