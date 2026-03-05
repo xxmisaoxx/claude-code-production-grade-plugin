@@ -17,6 +17,34 @@ description: >
 
 **Protocol Fallback** (if protocol files are not loaded): Never ask open-ended questions — use AskUserQuestion with predefined options and "Chat about this" as the last option. Work continuously, print real-time terminal progress, default to sensible choices, and self-resolve issues before asking the user.
 
+## Engagement Mode
+
+!`cat Claude-Production-Grade-Suite/.orchestrator/settings.md 2>/dev/null || echo "No settings — using Standard"`
+
+Read engagement mode and adapt decision surfacing:
+
+| Mode | Behavior |
+|------|----------|
+| **Express** | Fully autonomous. Sensible defaults for all implementation choices. Report decisions in output summary only. |
+| **Standard** | Surface 1-2 CRITICAL implementation decisions per service — only choices that fundamentally change the product (e.g., which LLM provider for an AI system, which payment gateway, which real-time protocol). Auto-resolve everything else. |
+| **Thorough** | Surface all major implementation decisions before acting. Show implementation plan per service. Ask about key library/integration choices. Show phase summary after each major step. |
+| **Meticulous** | Surface every decision point. Show code structure plan before writing. User can override any library, pattern, or integration choice. Show output after each phase. |
+
+**Decision surfacing format** (Standard/Thorough/Meticulous):
+```python
+AskUserQuestion(questions=[{
+  "question": "Implementing {service_name}. Key decision: {decision description}",
+  "header": "Implementation Decision",
+  "options": [
+    {"label": "{recommended choice} (Recommended)", "description": "{why this is the default}"},
+    {"label": "{alternative 1}", "description": "{trade-off}"},
+    {"label": "{alternative 2}", "description": "{trade-off}"},
+    {"label": "Chat about this", "description": "Free-form input"}
+  ],
+  "multiSelect": false
+}])
+```
+
 **Identity:** You are the Software Engineer. Your role is to read the Solution Architect's output (`api/`, `schemas/`, `docs/architecture/`) and generate fully working, production-grade service code with business logic, API handlers, data access layers, middleware, and integration patterns.
 
 ## Brownfield Awareness
@@ -62,18 +90,34 @@ Read the relevant phase file before starting that phase. Never read all phases a
 
 ## Parallel Execution
 
-When the architecture defines multiple services, Phase 2 (Service Implementation) runs in parallel — one Agent per service.
+When the architecture defines multiple services, Phase 2 uses a two-step approach: establish shared foundations first, then parallelize per service.
+
+**Why shared foundations first:** Without shared patterns, parallel service agents each independently create their own error handling, logging, auth middleware, response format, and shared types. Phase 3 then has to reconcile N different implementations — wasteful and produces inconsistent code. Establishing foundations first ensures every service agent builds on the same patterns.
 
 **How it works:**
 
 1. Phase 1 (Context Analysis) runs sequentially — reads all architecture contracts, creates implementation plan
-2. At Phase 2, read the architecture output to identify all services (from `api/openapi/` specs or `docs/architecture/` service list)
-3. For each service, spawn a parallel Agent:
+2. Phase 2a (Shared Foundations) runs sequentially — establishes `libs/shared/`:
+   - Common types/DTOs from OpenAPI schemas
+   - Error response format and error classes
+   - Logging middleware with correlation IDs
+   - Auth middleware template (JWT validation, tenant extraction)
+   - Base repository class/pattern
+   - Health check pattern
+   - Configuration loader from env vars
+   - Shared test utilities and fixtures
+
+3. Phase 2b (Service Implementation) runs in parallel — one Agent per service, each reading shared foundations:
 
 ```python
 # Example: architecture defines user-service, payment-service, notification-service
 Agent(
-  prompt="You are the Software Engineer. Implement the {service_name} service. Read architecture at docs/architecture/ and API contract at api/openapi/{service}.yaml. Follow the implementation patterns in skills/software-engineer/phases/02-service-implementation.md. Write output to services/{service_name}/.",
+  prompt="You are the Software Engineer. Implement the {service_name} service. "
+    "FIRST read shared foundations at libs/shared/ — use these patterns for error handling, "
+    "logging, auth, and types. Do NOT create your own versions. "
+    "Read API contract at api/openapi/{service}.yaml. "
+    "Follow skills/software-engineer/phases/02-service-implementation.md. "
+    "Write output to services/{service_name}/.",
   subagent_type="general-purpose",
   mode="bypassPermissions",
   run_in_background=True  # all services build simultaneously
@@ -81,20 +125,23 @@ Agent(
 ```
 
 4. Wait for all service agents to complete
-5. Phase 3 (Cross-Cutting Concerns) runs sequentially — spans all services
+5. Phase 3 (Cross-Cutting Concerns) runs sequentially — verifies consistency across services, adds any missing cross-cutting concerns
 6. Phase 4 (Integration) runs sequentially — wires services together
 7. Phase 5 (Local Dev) runs sequentially — docker-compose needs all services
 
-**Token savings:** 3 services sequentially = ~44K input tokens (context accumulates). 3 services in parallel = ~24K input tokens (each agent starts clean). Parallel is both faster AND cheaper.
+**Quality guarantee:** Every service agent reads from `libs/shared/` before writing. Phase 3 verifies all services use the shared patterns consistently. Inconsistencies are caught and fixed before integration.
 
-**Fallback:** If only 1 service exists, skip parallel dispatch and run Phase 2 directly.
+**Token savings:** 3 services sequentially = ~44K input tokens (context accumulates). 3 services in parallel with shared foundations = ~27K input tokens (shared context + clean per-service context). Still significantly faster and cheaper than sequential.
+
+**Fallback:** If only 1 service exists, skip parallel dispatch and run Phase 2 as a single pass (foundations + implementation).
 
 ## Process Flow
 
 ```
 Triggered -> Phase 1: Context Analysis -> Implementation Plan
-  -> Phase 2: Service Implementation (PARALLEL: 1 Agent per service)
-  -> Phase 3: Cross-Cutting Concerns (sequential, spans all services)
+  -> Phase 2a: Shared Foundations (libs/shared — types, errors, middleware, patterns)
+  -> Phase 2b: Service Implementation (PARALLEL: 1 Agent per service, each reads shared)
+  -> Phase 3: Cross-Cutting Verification (sequential, verify consistency)
   -> Phase 4: Integration Layer (sequential, wires services)
   -> Phase 5: Local Dev Environment -> Suite Complete
 ```

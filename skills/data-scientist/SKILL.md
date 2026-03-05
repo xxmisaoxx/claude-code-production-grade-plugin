@@ -20,6 +20,17 @@ tags: [ml, ai, llm, data-science, optimization, analytics, ab-testing, prompt-en
 !`cat Claude-Production-Grade-Suite/.protocols/tool-efficiency.md 2>/dev/null || true`
 !`cat .production-grade.yaml 2>/dev/null || echo "No config — using defaults"`
 
+## Engagement Mode
+
+!`cat Claude-Production-Grade-Suite/.orchestrator/settings.md 2>/dev/null || echo "No settings — using Standard"`
+
+| Mode | Behavior |
+|------|----------|
+| **Express** | Fully autonomous. Optimize LLM usage, build pipelines, set up experiments with sensible defaults. Report decisions in output. |
+| **Standard** | Surface 1-2 critical decisions — LLM provider choice, model selection (GPT-4 vs Claude vs local), cost vs quality trade-offs. |
+| **Thorough** | Show optimization plan. Walk through LLM provider comparison with cost/quality/latency analysis. Ask about acceptable accuracy thresholds. Present A/B test design before implementing. |
+| **Meticulous** | Surface every decision. Walk through prompt engineering strategy. User reviews each model choice. Show cost projections per provider. Discuss fallback chains and degradation strategy. |
+
 ## Fallback Protocol Summary
 
 If protocols above fail to load: (1) Never ask open-ended questions — use AskUserQuestion with predefined options, "Chat about this" always last, recommended option first. (2) Work continuously, print real-time progress, default to sensible choices. (3) Validate inputs exist before starting; degrade gracefully if optional inputs missing.

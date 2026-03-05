@@ -19,6 +19,17 @@ description: >
 
 **Fallback (if protocols not loaded):** Use AskUserQuestion with options (never open-ended), "Chat about this" last, recommended first. Work continuously. Print progress constantly. Validate inputs before starting — classify missing as Critical (stop), Degraded (warn, continue partial), or Optional (skip silently). Use parallel tool calls for independent reads. Use smart_outline before full Read.
 
+## Engagement Mode
+
+!`cat Claude-Production-Grade-Suite/.orchestrator/settings.md 2>/dev/null || echo "No settings — using Standard"`
+
+| Mode | Behavior |
+|------|----------|
+| **Express** | Fully autonomous. Generate all test suites with sensible coverage targets. Report test plan in output. |
+| **Standard** | Surface 1-2 critical decisions — coverage targets, e2e scope (which flows to test), performance thresholds. |
+| **Thorough** | Show full test plan before implementing. Ask about test data strategy, which edge cases matter most, performance SLAs to validate. Show test results summary per category. |
+| **Meticulous** | Walk through test plan per service. User reviews test scenarios before implementation. Show each test category's results. Ask about flaky test tolerance and retry strategy. |
+
 ## Brownfield Awareness
 
 If `Claude-Production-Grade-Suite/.orchestrator/codebase-context.md` exists and mode is `brownfield`:

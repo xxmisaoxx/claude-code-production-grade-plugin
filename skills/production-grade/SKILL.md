@@ -168,7 +168,36 @@ Read these from the plugin's `skills/_shared/protocols/` directory and copy them
 
    All agents read this file before executing. It overrides default "create from scratch" behavior.
 
-5. **Parallelism preference:**
+5. **Engagement mode:**
+
+```python
+AskUserQuestion(questions=[{
+  "question": "How deeply should the pipeline involve you in decisions?",
+  "header": "Engagement Mode",
+  "options": [
+    {"label": "Standard (Recommended)", "description": "3 gates + moderate architect interview. Best balance of speed and control."},
+    {"label": "Express", "description": "Minimal interaction. 3 gates only, auto-derive architecture from BRD. Fastest."},
+    {"label": "Thorough", "description": "Deep interviews at PM and Architect. Full capacity planning. Review phase summaries."},
+    {"label": "Meticulous", "description": "Maximum depth. Approve each ADR individually. Review every agent output. Full control."}
+  ],
+  "multiSelect": false
+}])
+```
+
+Write the choice to `Claude-Production-Grade-Suite/.orchestrator/settings.md`:
+```markdown
+# Pipeline Settings
+Engagement: [express|standard|thorough|meticulous]
+Parallelism: [maximum|standard|sequential]
+```
+
+All skills read this file at startup to adapt their depth. The engagement mode controls:
+- **PM interview depth** — Express: 2-3 questions. Standard: 3-5. Thorough: 5-8. Meticulous: 8-12.
+- **Architect discovery depth** — Express: auto-derive. Standard: 5-7 questions. Thorough: 12-15 with capacity planning. Meticulous: full walkthrough + individual ADR approval.
+- **Phase summaries** — Thorough/Meticulous show intermediate outputs between phases.
+- **Gate detail** — Meticulous adds per-agent output review at each gate.
+
+6. **Parallelism preference:**
 
 ```python
 AskUserQuestion(questions=[{
@@ -183,11 +212,11 @@ AskUserQuestion(questions=[{
 }])
 ```
 
-Store the choice. Maximum is the recommended default — parallel execution is both faster AND cheaper in total tokens because each agent carries minimal context instead of accumulating prior work.
+Store both choices in `Claude-Production-Grade-Suite/.orchestrator/settings.md`. Maximum parallelism is the recommended default — parallel execution is both faster AND cheaper in total tokens because each agent carries minimal context instead of accumulating prior work.
 
-6. **Detect existing workspace** — if `Claude-Production-Grade-Suite/.orchestrator/` has prior state, offer to resume or restart via AskUserQuestion.
+7. **Detect existing workspace** — if `Claude-Production-Grade-Suite/.orchestrator/` has prior state, offer to resume or restart via AskUserQuestion.
 
-7. **Polymath pre-flight check:**
+8. **Polymath pre-flight check:**
    - If `Claude-Production-Grade-Suite/polymath/handoff/context-package.md` exists → read it, pass to PM as pre-loaded context. Log: `✓ Polymath context loaded — skipping redundant discovery`
    - If no polymath context, assess the user's request for knowledge gaps:
      - **Vague scope** (no specific problem domain), **no constraints** (scale, budget, team), **complex domain with no domain language**, **contradictory signals**
@@ -195,17 +224,17 @@ Store the choice. Maximum is the recommended default — parallel execution is b
      - If no gaps → proceed directly. Log: `✓ Request is clear — proceeding to PM`
    - If user explicitly requests to skip polymath ("just build it", clear detailed spec) → proceed immediately.
 
-8. **Research the domain** — use WebSearch before asking the user anything (skip if polymath already researched).
+9. **Research the domain** — use WebSearch before asking the user anything (skip if polymath already researched).
 
-9. **Create team and task graph:**
+10. **Create team and task graph:**
 ```python
 TeamCreate(team_name="production-grade")
 ```
 Create all 13 tasks with dependencies (see Task Dependency Graph). Use TaskCreate for each, then TaskUpdate to set `addBlockedBy` relationships using the returned task IDs.
 
-10. **Begin Phase 1** — read `phases/define.md` and start immediately. Do NOT ask "should I proceed?"
+11. **Begin Phase 1** — read `phases/define.md` and start immediately. Do NOT ask "should I proceed?"
 
-**Key principle:** The user already told you what to build. Research, plan, start building. Only pause at the 3 approval gates.
+**Key principle:** The user already told you what to build. Research, plan, start building. Pause at the 3 approval gates. In Thorough/Meticulous mode, also show phase summaries between major phases — but never block on them (inform, don't gate).
 
 ## User Experience Protocol
 
@@ -410,8 +439,8 @@ Each phase loads its dispatcher file for task management and agent spawning.
 
 | Skill | What Parallelizes Internally |
 |-------|------------------------------|
-| software-engineer | 1 Agent per service (Phase 2: implementation) |
-| frontend-engineer | 1 Agent per page group (Phase 4: pages) |
+| software-engineer | Shared foundations first (sequential), then 1 Agent per service (Phase 2b: parallel). Quality over speed — foundations ensure consistency. |
+| frontend-engineer | UI Primitives first (sequential), then Layout + Features parallel (Phase 3b), then Pages parallel (Phase 4). Primitives are foundational atoms. |
 | qa-engineer | 4 parallel Agents: unit, integration, e2e, performance tests |
 | security-engineer | 4 parallel Agents: code audit, auth review, data security, supply chain |
 | code-reviewer | 3 parallel Agents: arch conformance, code quality, performance review |
@@ -573,7 +602,9 @@ Every agent follows:
 | Skipping tests | Production grade means tested |
 | Not running code after writing | Every agent verifies output compiles and runs |
 | Agents working in isolation | Cross-reference via Context Bridging table |
-| Over-asking the user | 3 gates only — sensible defaults otherwise |
+| Over-asking the user | Respect engagement mode. Express: 3 gates only. Standard: 3 gates + moderate interview. Thorough/Meticulous: deeper interviews but always structured options. |
+| Ignoring engagement mode | ALL skills must read settings.md and adapt depth. Express architect doesn't ask 15 questions. Meticulous PM doesn't skip to BRD after 2 questions. |
+| One-size-fits-all architecture | Architecture is derived from constraints (scale, team, budget, compliance). A 100-user internal tool does NOT need microservices + K8s. |
 | Writing stubs | No `// TODO: implement` in production code |
 | Hardcoded paths | Read `.production-grade.yaml` for path overrides |
 | Sequential when parallel possible | Maximum parallelism: two-wave execution + internal skill agents. Every independent unit gets its own agent |

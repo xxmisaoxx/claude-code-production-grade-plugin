@@ -2,6 +2,23 @@
 
 All notable changes to the Production Grade Plugin.
 
+## [4.1.0] — 2026-03-05
+
+### Added
+- **Engagement modes** — 4-level interaction depth (Express, Standard, Thorough, Meticulous) chosen at pipeline start. Controls PM interview depth, architect discovery depth, and phase summary visibility. Persisted in `Claude-Production-Grade-Suite/.orchestrator/settings.md`.
+- **Architecture Fitness Function** — Solution Architect now DERIVES architecture from constraints instead of picking templates. Scale, team size, budget, compliance, data patterns, geographic distribution, growth model, and uptime SLA all feed into architecture decisions. A 100-user internal tool gets a monolith; a 10M-user platform gets microservices.
+- **Scale & Fitness Interview** — Adaptive 1-4 round interview (depth scales with engagement mode). Covers: users, CCU, data patterns, team size, budget, compliance, latency, uptime SLA, geographic distribution, growth model, vendor strategy, extensibility.
+- **Adaptive PM interview** — Express: 2-3 questions. Standard: 3-5. Thorough: 5-8 with competitive analysis. Meticulous: 8-12 across multiple rounds with co-authored acceptance criteria.
+
+### Changed
+- **Engagement mode propagated to ALL 14 skills** — every agent reads `settings.md` and adapts decision surfacing. Express: fully autonomous. Standard: surface 1-2 critical decisions. Thorough: surface all major decisions. Meticulous: surface every decision point.
+- Solution Architect Phase 1 rewritten from 5 shallow questions to a comprehensive adaptive discovery process with structured AskUserQuestion options at every step.
+- Product Manager Phase 1 rewritten with 4 interview depth profiles matching engagement modes.
+- Pipeline kickoff now asks engagement mode before parallelism preference (step 5, renumbered to 11 total steps).
+- **Software Engineer parallelism revised** — shared foundations (libs/shared: types, errors, middleware, auth, logging, config) established SEQUENTIALLY before parallel service agents. Each service agent reads shared foundations. Prevents N different error handling/auth implementations.
+- **Frontend Engineer parallelism revised** — UI Primitives built SEQUENTIALLY first (foundational atoms), then Layout + Feature components in PARALLEL (both import from primitives). Prevents duplicate Button/Input implementations.
+- Orchestrator internal skill parallelism table updated to reflect foundations-first pattern.
+
 ## [4.0.0] — 2026-03-05
 
 ### Changed

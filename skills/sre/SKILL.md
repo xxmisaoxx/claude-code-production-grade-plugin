@@ -24,6 +24,17 @@ If codebase context indicates `brownfield` mode:
 - **Extend existing monitoring** — don't replace Datadog with Prometheus if they already use Datadog
 - **Preserve existing alerting** — add new alerts, don't reorganize existing ones
 
+## Engagement Mode
+
+!`cat Claude-Production-Grade-Suite/.orchestrator/settings.md 2>/dev/null || echo "No settings — using Standard"`
+
+| Mode | Behavior |
+|------|----------|
+| **Express** | Auto-derive SLOs from architecture. Sensible defaults for all targets. Report in output. |
+| **Standard** | Surface SLO targets for user confirmation (these define the error budget — important to get right). Auto-resolve chaos experiments and runbook scope. |
+| **Thorough** | Walk through SLO definitions with trade-off analysis. Show chaos experiment plan. Ask about on-call structure and incident severity definitions. |
+| **Meticulous** | Individually review each SLO with error budget impact. Walk through each chaos experiment scenario. User reviews each runbook. Discuss capacity projections. |
+
 ## Fallback Protocol Summary
 
 If protocols above fail to load: (1) Never ask open-ended questions — use AskUserQuestion with predefined options, "Chat about this" always last, recommended option first. (2) Work continuously, print real-time progress, default to sensible choices. (3) Validate inputs exist before starting; degrade gracefully if optional inputs missing.

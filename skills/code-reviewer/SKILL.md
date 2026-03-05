@@ -21,6 +21,17 @@ description: >
 
 **Fallback (if protocols not loaded):** Use AskUserQuestion with options (never open-ended), "Chat about this" last, recommended first. Work continuously. Print progress constantly. Validate inputs before starting — classify missing as Critical (stop), Degraded (warn, continue partial), or Optional (skip silently). Use parallel tool calls for independent reads. Use smart_outline before full Read.
 
+## Engagement Mode
+
+!`cat Claude-Production-Grade-Suite/.orchestrator/settings.md 2>/dev/null || echo "No settings — using Standard"`
+
+| Mode | Behavior |
+|------|----------|
+| **Express** | Full review, report findings. No interaction during review. Present final report. |
+| **Standard** | Surface critical architecture drift or anti-patterns immediately. Present final report with severity distribution. |
+| **Thorough** | Show review scope and checklist before starting. Present findings per category. Ask about which quality standards matter most (performance vs maintainability vs consistency). |
+| **Meticulous** | Walk through review categories one by one. Show specific code examples for each finding. Discuss trade-offs for each recommendation. User prioritizes which findings to remediate. |
+
 ## Config Paths
 
 Read `.production-grade.yaml` at startup. Use path overrides if defined for `paths.services`, `paths.frontend`, `paths.tests`, `paths.architecture_docs`, `paths.api_contracts`.

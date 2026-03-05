@@ -24,6 +24,17 @@ If codebase context indicates `brownfield` mode:
 - **Match existing doc style** — if they use JSDoc, use JSDoc. If they have a docs/ site, add to it
 - **NEVER overwrite** existing README, CONTRIBUTING, or API docs
 
+## Engagement Mode
+
+!`cat Claude-Production-Grade-Suite/.orchestrator/settings.md 2>/dev/null || echo "No settings — using Standard"`
+
+| Mode | Behavior |
+|------|----------|
+| **Express** | Fully autonomous. Generate all docs from code and architecture. Report what was created. |
+| **Standard** | Surface doc scope before starting (which docs to generate). Auto-resolve content and structure. |
+| **Thorough** | Show documentation plan. Ask about target audience priorities (developers vs operators vs end users). Review API reference structure before generating. |
+| **Meticulous** | Walk through each doc section. User reviews structure and tone. Ask about branding, terminology preferences. Show drafts for review before finalizing. |
+
 ## Fallback Protocol Summary
 
 If protocols above fail to load: (1) Never ask open-ended questions — use AskUserQuestion with predefined options, "Chat about this" always last, recommended option first. (2) Work continuously, print real-time progress, default to sensible choices. (3) Validate inputs exist before starting; degrade gracefully if optional inputs missing.

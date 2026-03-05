@@ -2,7 +2,7 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/nagisanzenin/claude-code-production-grade-plugin?style=social)](https://github.com/nagisanzenin/claude-code-production-grade-plugin)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-4.0.0-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-4.1.0-blue.svg)]()
 [![Skills](https://img.shields.io/badge/skills-14-green.svg)]()
 [![Parallel Points](https://img.shields.io/badge/parallel%20points-10+-orange.svg)]()
 
@@ -10,7 +10,7 @@
 
 Most AI coding tools generate files. This one builds *systems* — architecture, tests, security audits, infrastructure, monitoring, documentation — with a co-pilot that thinks with you before a single line of code is written.
 
-> **v4.0** — 14 skills. Two-wave parallel execution. Internal skill parallelism. Dynamic task generation. ~3x faster, ~45% fewer tokens. Polymath co-pilot. Brownfield-safe. Works on greenfield and existing projects.
+> **v4.1** — 4 engagement modes. Scale-driven architecture fitness function. Adaptive PM & Architect interviews. 14 skills. Two-wave parallel execution. ~3x faster, ~45% fewer tokens. Polymath co-pilot. Brownfield-safe.
 
 ### Quick Start
 
@@ -47,6 +47,7 @@ The result: you describe what you want in plain language. 14 specialized agents 
 | **Dynamic task generation** | Orchestrator reads architecture output, spawns 1 agent per service/page |
 | **4 shared protocols** | UX, input validation, tool efficiency, conflict resolution |
 | **6 Polymath modes** | Onboard, research, ideate, advise, translate, synthesize |
+| **4 engagement modes** | Express, Standard, Thorough, Meticulous — choose your interaction depth |
 | **0 open-ended questions** | Every user interaction is structured: arrow keys + Enter |
 
 ### What Makes This Unique
@@ -57,7 +58,11 @@ The result: you describe what you want in plain language. 14 specialized agents 
 
 **Non-technical users can drive the entire pipeline.** Every interaction is multiple choice. At every approval gate, "Chat about this" invokes the Polymath to explain technical decisions in plain language. You don't need to understand "modular monolith with row-level multi-tenancy" — the Polymath translates it to *"one building with separate rooms, each customer's data in its own locked drawer."*
 
+**Architecture derived from YOUR constraints, not a template.** There is no one-size-fits-all architecture. The Solution Architect conducts a scale and fitness interview — users, CCU, budget, team size, compliance, data patterns — and derives the right architecture pattern, infrastructure sizing, and data strategy. A 100-user internal tool gets a monolith with managed services. A 10M-user global platform gets microservices with multi-region deployment. The architecture fits the problem.
+
 **Authority hierarchy eliminates conflicts.** When 14 agents work on the same codebase, overlapping outputs create chaos. Production Grade solves this with sole-authority domains: security-engineer owns OWASP (code-reviewer must not do security review), SRE owns SLOs (devops must not define them), and findings are deduplicated by file:line with highest severity kept.
+
+**Adjustable interaction depth — from hands-off to full control.** At pipeline start, choose your engagement mode: Express (minimal interaction, auto-derive everything), Standard (balanced), Thorough (deep capacity planning, architecture trade-off analysis), or Meticulous (approve each decision individually, full walkthrough). Non-technical founders use Express. Senior architects use Meticulous. Everyone gets the right depth.
 
 **Adapts to your project, not the other way around.** API-only project? Frontend is auto-skipped. Using LLM APIs? Data scientist auto-activates. Existing codebase? `.production-grade.yaml` maps to your directory structure. The pipeline shapes itself to the problem.
 
@@ -323,6 +328,8 @@ Native Claude Code Teams/TaskList. No custom state files.
 ## Release Timeline
 
 ```
+    v4.1  ●━━━ Engagement modes, scale-driven architecture fitness function, adaptive interviews
+          │
     v4.0  ●━━━ Two-wave parallelism, internal skill agents, dynamic task generation
           │
     v3.3  ●━━━ Brownfield-safe — works on existing codebases
