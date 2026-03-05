@@ -310,6 +310,24 @@ Native Claude Code Teams/TaskList. No custom state files.
 
 ---
 
+## Release Timeline
+
+```
+    v3.2  ●━━━ Auto-update with consent
+          │
+    v3.1  ●━━━ Polymath co-pilot — the 14th skill
+          │
+    v3.0  ●━━━ Full rewrite — Teams/TaskList, 7 parallel points, shared protocols
+          │
+    v2.0  ●━━━ 13 bundled skills, unified workspace, prescriptive UX
+          │
+    v1.0  ●━━━ Initial release — autonomous DEFINE>BUILD>HARDEN>SHIP>SUSTAIN
+```
+
+See [CHANGELOG.md](./CHANGELOG.md) for full details.
+
+---
+
 ## Star History
 
 <a href="https://star-history.com/#nagisanzenin/claude-code-production-grade-plugin&Date">
