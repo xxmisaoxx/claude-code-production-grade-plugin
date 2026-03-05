@@ -35,38 +35,30 @@ Traditional AI coding tools assume you arrive with perfect clarity: the right ar
 
 The result: you describe what you want in plain language. 14 specialized agents research, design, build, test, secure, deploy, and document a complete production system. You approve 3 times. That's it.
 
-### What Sets This Apart
+### By the Numbers
 
-**vs. Traditional AI Coding (ChatGPT, Copilot, Cursor)**
+| Metric | Detail |
+|--------|--------|
+| **14 specialized agents** | Each with sole authority over its domain — no overlap, no contradiction |
+| **7 parallel execution points** | Backend + frontend, containers, QA + security + review, IaC + remediation, SRE + data science, docs + skills |
+| **3 approval gates** | Everything between gates is fully autonomous |
+| **4 shared protocols** | UX, input validation, tool efficiency, conflict resolution — enforced across all agents |
+| **6 Polymath modes** | Onboard, research, ideate, advise, translate, synthesize |
+| **5 pipeline phases** | DEFINE, BUILD, HARDEN, SHIP, SUSTAIN |
+| **65% token savings** | Router + on-demand phase loading vs. monolithic skill files |
+| **0 open-ended questions** | Every user interaction is structured: arrow keys + Enter |
 
-| Traditional | Production Grade |
-|-------------|-----------------|
-| You drive every decision | Agents make sensible decisions, you approve at 3 strategic gates |
-| Generates code fragments | Generates complete systems: services, tests, infra, CI/CD, docs |
-| No memory between prompts | Persistent workspace — agents read each other's work |
-| You need to know what to ask for | Polymath detects gaps and fills them before you ask |
-| Security is your problem | Dedicated security engineer audits every build automatically |
+### What Makes This Unique
 
-**vs. Other Claude Code Plugins**
+**A co-pilot that thinks with you, not just for you.** The Polymath researches your domain via live web search before you answer a single question. It detects knowledge gaps in your request and fills them. No other plugin has a dedicated thinking partner that bridges the gap between "I have an idea" and "I know exactly what to build."
 
-| Typical plugins | Production Grade |
-|----------------|-----------------|
-| Single-skill (one task, one skill) | 14 coordinated skills with authority hierarchy and conflict resolution |
-| User manages the workflow | Autonomous pipeline: DEFINE, BUILD, HARDEN, SHIP, SUSTAIN |
-| Sequential execution | 7 parallel execution points — backend + frontend build simultaneously |
-| Assume technical user | Polymath translates everything — non-technical users can drive the pipeline |
-| Static behavior | Adaptive: skips frontend for API-only, enables data science for ML, scales to project complexity |
-| Greenfield only | Config layer maps to existing project structures |
+**Full-lifecycle coverage in a single install.** Requirements, architecture, backend, frontend, testing, security audit, code review, infrastructure, CI/CD, SRE readiness, documentation, and custom skill generation — all coordinated through a dependency graph with parallel execution. Most plugins cover one or two of these steps.
 
-**vs. Not Using AI At All**
+**Non-technical users can drive the entire pipeline.** Every interaction is multiple choice. At every approval gate, "Chat about this" invokes the Polymath to explain technical decisions in plain language. You don't need to understand "modular monolith with row-level multi-tenancy" — the Polymath translates it to *"one building with separate rooms, each customer's data in its own locked drawer."*
 
-| Manual development | Production Grade |
-|-------------------|-----------------|
-| Weeks to go from idea to architecture | Hours. Research, BRD, architecture, API contracts — in one session |
-| Security audit after launch (if ever) | Security engineer runs STRIDE + OWASP on every build |
-| Docs written months later (if ever) | Technical writer generates docs as the final pipeline step |
-| One developer doing everything | 14 specialists, each expert in their domain, working in parallel |
-| Consistency depends on discipline | Enforced by shared protocols and authority hierarchy |
+**Authority hierarchy eliminates conflicts.** When 14 agents work on the same codebase, overlapping outputs create chaos. Production Grade solves this with sole-authority domains: security-engineer owns OWASP (code-reviewer must not do security review), SRE owns SLOs (devops must not define them), and findings are deduplicated by file:line with highest severity kept.
+
+**Adapts to your project, not the other way around.** API-only project? Frontend is auto-skipped. Using LLM APIs? Data scientist auto-activates. Existing codebase? `.production-grade.yaml` maps to your directory structure. The pipeline shapes itself to the problem.
 
 ---
 
