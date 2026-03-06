@@ -22,8 +22,7 @@
 
 <br>
 
-<details>
-<summary><strong>Release Timeline</strong></summary>
+## Release Timeline
 
 ```
 2026-03-06  v5.0  ●━━━ Verified & Resilient — receipt enforcement, re-anchoring, adversarial review
@@ -50,8 +49,6 @@
                   │
 2026-02-24  v1.0  ●━━━ Initial release — autonomous DEFINE>BUILD>HARDEN>SHIP>SUSTAIN
 ```
-
-</details>
 
 ---
 
