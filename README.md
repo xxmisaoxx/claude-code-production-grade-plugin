@@ -18,17 +18,6 @@
 /plugin install production-grade@nagisanzenin
 ```
 
----
-
-## Contributing
-
-1. Fork the repo
-2. Create a branch: `git checkout -b feature/your-feature`
-3. Commit changes
-4. Open a Pull Request
-
-**Adding a skill:** Create `skills/your-skill-name/SKILL.md` with `---` frontmatter. For large skills, use the router + phases pattern.
-
 ## Release Timeline
 
 ```
@@ -264,6 +253,17 @@ Not anymore. Re-anchoring re-reads workspace artifacts from disk at every phase 
 
 **What if I'm not technical?**
 Every interaction is multiple choice. Polymath translates technical decisions to plain language at any gate.
+
+---
+
+## Contributing
+
+1. Fork the repo
+2. Create a branch: `git checkout -b feature/your-feature`
+3. Commit changes
+4. Open a Pull Request
+
+**Adding a skill:** Create `skills/your-skill-name/SKILL.md` with `---` frontmatter. For large skills, use the router + phases pattern.
 
 ---
 
