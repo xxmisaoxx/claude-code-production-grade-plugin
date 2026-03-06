@@ -4,21 +4,26 @@
   <img src="assets/banner.png" alt="Meet the Production Grade crew — 14 AI agents" width="700">
 </p>
 
-[![GitHub stars](https://img.shields.io/github/stars/nagisanzenin/claude-code-production-grade-plugin?style=social)](https://github.com/nagisanzenin/claude-code-production-grade-plugin)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-5.0.0-blue.svg)]()
-[![Skills](https://img.shields.io/badge/skills-14-green.svg)]()
-[![Protocols](https://img.shields.io/badge/protocols-7-red.svg)]()
-[![Modes](https://img.shields.io/badge/execution%20modes-10-purple.svg)]()
+<p align="center">
+  <a href="https://github.com/nagisanzenin/claude-code-production-grade-plugin"><img src="https://img.shields.io/github/stars/nagisanzenin/claude-code-production-grade-plugin?style=social" alt="GitHub stars"></a>
+  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT License">
+  <img src="https://img.shields.io/badge/version-5.0.0-blue.svg" alt="Version">
+  <img src="https://img.shields.io/badge/agents-14-green.svg" alt="14 agents">
+  <img src="https://img.shields.io/badge/protocols-7-red.svg" alt="7 protocols">
+  <img src="https://img.shields.io/badge/execution%20modes-10-purple.svg" alt="10 modes">
+</p>
 
-**14 AI agents, one install, idea to production.**
+<h3 align="center">14 AI agents, one install, idea to production.</h3>
 
 ```bash
 /plugin marketplace add nagisanzenin/claude-code-plugins
 /plugin install production-grade@nagisanzenin
 ```
 
-## Release Timeline
+<br>
+
+<details>
+<summary><strong>Release Timeline</strong></summary>
 
 ```
 2026-03-06  v5.0  ●━━━ Verified & Resilient — receipt enforcement, re-anchoring, adversarial review
@@ -46,185 +51,261 @@
 2026-02-24  v1.0  ●━━━ Initial release — autonomous DEFINE>BUILD>HARDEN>SHIP>SUSTAIN
 ```
 
----
-
-## What It Does
-
-You describe what you want. 14 specialized agents handle requirements, architecture, backend, frontend, testing, security audit, code review, infrastructure, CI/CD, SRE, documentation, and custom skills — coordinated through a parallel pipeline with 3 approval gates.
-
-Not just greenfield builds. Add a feature, harden before launch, review code, set up CI/CD, write tests, design architecture, optimize performance, or explore an idea with a thinking partner.
-
-**10 execution modes** — the orchestrator reads your request and routes to the right skills automatically:
-
-| Mode | What Runs | Example |
-|------|-----------|---------|
-| **Full Build** | All 14 agents, 5 phases, 3 gates | *"Build a SaaS for multi-vendor e-commerce"* |
-| **Feature** | PM + Architect + Engineers + QA | *"Add Stripe billing to my API"* |
-| **Harden** | Security + QA + Code Review | *"Audit this codebase before launch"* |
-| **Ship** | DevOps + SRE + Data Scientist | *"Set up CI/CD and monitoring"* |
-| **Test** | QA Engineer | *"Write integration tests for the auth module"* |
-| **Review** | Code Reviewer | *"Review this PR for quality"* |
-| **Architect** | Solution Architect | *"Design the system for a booking platform"* |
-| **Document** | Technical Writer | *"Generate API docs and dev guides"* |
-| **Explore** | Polymath | *"Help me think about building a fintech app"* |
-| **Optimize** | Software Engineer + Data Scientist | *"Reduce our API latency"* |
+</details>
 
 ---
 
-## Why This Plugin
+## The Pipeline
 
-### 1. Verified execution — receipts prove every gate ran
+```
+  YOU ──→ "Build a SaaS for ..."
+           │
+           ▼
+  ┌─────────────────────────────────────────────────────────────────┐
+  │                    DEFINE                                       │
+  │  T1  Product Manager ─── BRD, user stories, acceptance criteria│
+  │  T2  Solution Architect ─ ADRs, API contracts, data models     │
+  │                                                                 │
+  │  ┌─────────────┐  ┌──────────────┐                             │
+  │  │ GATE 1      │  │ GATE 2       │                             │
+  │  │ Requirements│  │ Architecture │                             │
+  │  └─────────────┘  └──────────────┘                             │
+  └─────────────────────────────────────────────────────────────────┘
+           │
+           ▼
+  ┌─────────────────────────────────────────────────────────────────┐
+  │               BUILD + ANALYZE  (Wave A — parallel)             │
+  │                                                                 │
+  │  Backend ──── N agents (1 per service)    QA ──── test plan    │
+  │  Frontend ─── N agents (1 per page)       Security ── STRIDE   │
+  │  DevOps ──── Dockerfiles + CI skeleton    Review ── checklist  │
+  │                                           SRE ───── SLOs       │
+  └─────────────────────────────────────────────────────────────────┘
+           │
+           ▼
+  ┌─────────────────────────────────────────────────────────────────┐
+  │               HARDEN  (Wave B — parallel against code)         │
+  │                                                                 │
+  │  QA ─────── unit / integration / e2e / performance tests       │
+  │  Security ── code audit + dependency scan (4 parallel phases)  │
+  │  Review ──── arch / quality / performance (adversarial)        │
+  │  DevOps ──── build + push containers                           │
+  └─────────────────────────────────────────────────────────────────┘
+           │
+           ▼
+  ┌─────────────────────────────────────────────────────────────────┐
+  │                          SHIP                                   │
+  │                                                                 │
+  │  DevOps ── IaC + CI/CD  ┐                                      │
+  │  Remediation ───────────┘ parallel    ┌──────────────┐         │
+  │  SRE ── chaos + capacity ┐            │ GATE 3       │         │
+  │  Data Scientist ─────────┘ parallel   │ Production   │         │
+  │                                       │ Readiness    │         │
+  │                                       └──────────────┘         │
+  └─────────────────────────────────────────────────────────────────┘
+           │
+           ▼
+  ┌─────────────────────────────────────────────────────────────────┐
+  │                        SUSTAIN                                  │
+  │                                                                 │
+  │  Technical Writer ── API ref + dev guides (parallel)           │
+  │  Skill Maker ─────── 3-5 project-specific reusable skills     │
+  │  Compound Learning ── pipeline insights for next run           │
+  └─────────────────────────────────────────────────────────────────┘
+           │
+           ▼
+        DONE ── receipts verified, agents cleaned up
+```
 
-Every agent writes a JSON receipt as proof of completion. Receipts list artifacts produced, concrete metrics, and verification summary. The orchestrator verifies receipts and artifact existence at every phase transition and before every gate. No receipt = task not complete.
+> **3 gates. 2 waves. 10+ parallel execution points. ~3x faster than sequential.**
 
-For Critical/High security findings, a **remediation chain** requires three receipts: finding receipt, fix receipt, and verification receipt from the original finder confirming the fix. All three must exist before Gate 3 opens.
+---
 
-### 2. Accurate across long runs — re-anchoring protocol
+## 10 Execution Modes
 
-Claude Code compresses context automatically in long conversations. Over a multi-hour pipeline run, agents can drift from the original specs. The re-anchoring protocol forces the orchestrator to **re-read key workspace artifacts from disk** at every phase transition (DEFINE to BUILD, BUILD to HARDEN, HARDEN to SHIP, SHIP to SUSTAIN). Agents work from what's on disk, not degraded memory.
+Not just full builds. The orchestrator reads your request and routes automatically.
 
-### 3. Adversarial code review — finds bugs the author can't see
+```
+┌──────────────────────────────────────────────────────────────┐
+│                                                              │
+│   Full Build ████████████████████████  all 14 agents         │
+│   Feature    █████████████            PM+Arch+Eng+QA        │
+│   Harden     ████████                 Sec+QA+Review         │
+│   Ship       ██████                   DevOps+SRE+DS         │
+│   Architect  ████                     Solution Architect     │
+│   Test       ███                      QA Engineer            │
+│   Review     ███                      Code Reviewer          │
+│   Document   ███                      Technical Writer       │
+│   Optimize   █████                    SWE+Data Scientist     │
+│   Explore    ███                      Polymath               │
+│                                                              │
+└──────────────────────────────────────────────────────────────┘
+```
 
-The code reviewer operates as an **adversarial challenger**, not a neutral observer. Assumes code is wrong until proven right. Scaled with engagement mode:
-
-| Mode | Stance |
-|------|--------|
-| Express | Critical-only bug hunt |
-| Standard | Critical + High severity |
-| Thorough | All severities with edge case analysis |
-| Meticulous | Hostile review with reproducible break scenarios |
-
-Each review phase (architecture conformance, code quality, performance, test quality) has explicit adversarial framing directing the reviewer to assume violations exist.
-
-### 4. Always-current data — freshness protocol
-
-LLMs produce stale information: wrong model IDs, deprecated APIs, outdated pricing. The freshness protocol gives all 14 agents **temporal sensitivity to volatile data**. Before implementing, agents classify data volatility and WebSearch to verify:
-
-| Tier | Volatility | Action | Examples |
-|------|-----------|--------|----------|
-| Critical | Days-weeks | MUST search | LLM model IDs, API pricing, CVEs |
-| High | Weeks-months | Search when writing config | Package versions, Docker tags |
-| Medium | Months-quarters | Search if uncertain | Browser APIs, crypto practices |
-| Stable | Years+ | Trust training data | Language fundamentals, protocols |
-
-### 5. Architecture from constraints, not templates
-
-The Solution Architect derives architecture from your actual constraints — scale, team size, budget, compliance, data patterns, geographic distribution, growth model, uptime SLA. A 100-user internal tool gets a monolith. A 10M-user global platform gets microservices with multi-region deployment.
-
-### 6. Non-technical users can drive the entire pipeline
-
-Every interaction is multiple choice (arrow keys + Enter). At approval gates, "Chat about this" invokes the Polymath to explain decisions in plain language. You don't need to understand "modular monolith with row-level multi-tenancy" — the Polymath translates it.
+```
+"Build a SaaS for e-commerce"           → Full Build
+"Add Stripe billing to my API"          → Feature
+"Audit this codebase before launch"     → Harden
+"Set up CI/CD and monitoring"           → Ship
+"Review this PR for quality"            → Review
+"Help me think about a fintech app"     → Explore
+```
 
 ---
 
 ## The Crew
 
-14 specialized agents. Each owns its domain exclusively — no overlap, no contradiction.
+```
+                    ┌─────────────────┐
+                    │  ORCHESTRATOR   │
+                    │  routes, gates, │
+                    │  receipts       │
+                    └────────┬────────┘
+                             │
+        ┌────────────────────┼────────────────────┐
+        │                    │                     │
+   ┌────▼─────┐     ┌───────▼────────┐    ┌──────▼───────┐
+   │  DEFINE  │     │     BUILD      │    │   HARDEN     │
+   │          │     │                │    │              │
+   │ PM       │     │ Software Eng   │    │ QA Engineer  │
+   │ Architect│     │ Frontend Eng   │    │ Security Eng │
+   │          │     │ DevOps         │    │ Code Review  │
+   └──────────┘     └────────────────┘    └──────────────┘
+                             │
+        ┌────────────────────┼────────────────────┐
+        │                    │                     │
+   ┌────▼─────┐     ┌───────▼────────┐    ┌──────▼───────┐
+   │   SHIP   │     │    SUSTAIN     │    │   ANYTIME    │
+   │          │     │                │    │              │
+   │ DevOps   │     │ Tech Writer    │    │ Polymath     │
+   │ SRE      │     │ Skill Maker    │    │ Data Sci     │
+   └──────────┘     └────────────────┘    └──────────────┘
+```
 
-| # | Agent | Domain |
-|---|-------|--------|
-| 1 | **Orchestrator** | Routes requests, manages pipeline, enforces gates, verifies receipts |
-| 2 | **Polymath** | Thinking partner — research, ideation, onboarding, advice, translation |
-| 3 | **Product Manager** | Requirements — BRD, user stories, acceptance criteria, prioritization |
-| 4 | **Solution Architect** | System design — ADRs, tech stack, API contracts, data models, scaffold |
-| 5 | **Software Engineer** | Backend — handlers, services, repositories, business logic |
-| 6 | **Frontend Engineer** | Web UI — design system, components, pages, API clients, accessibility |
-| 7 | **QA Engineer** | Testing — unit, integration, e2e, performance, contract tests |
-| 8 | **Security Engineer** | Security (sole authority) — STRIDE, OWASP, PII, dependency scanning |
-| 9 | **Code Reviewer** | Quality (adversarial) — architecture conformance, anti-patterns, performance |
-| 10 | **DevOps** | Infrastructure — Docker, Terraform, CI/CD, monitoring, containers |
-| 11 | **SRE** | Reliability (sole authority) — SLOs, chaos engineering, runbooks, capacity |
-| 12 | **Data Scientist** | AI/ML — LLM optimization, prompt engineering, cost modeling, experiments |
-| 13 | **Technical Writer** | Documentation — API reference, dev guides, architecture overviews |
-| 14 | **Skill Maker** | Automation — generates 3-5 project-specific reusable Claude Code skills |
-
-### Sole Authority Domains
-
-| Domain | Owner | Others Must Not |
-|--------|-------|-----------------|
-| OWASP, STRIDE, PII | Security Engineer | Code Reviewer skips security |
-| SLOs, error budgets, runbooks | SRE | DevOps skips SLO definitions |
-| Code quality, arch conformance | Code Reviewer | Read-only analysis, never modifies code |
-| Requirements | Product Manager | Architect flags gaps, doesn't change requirements |
-| Architecture | Solution Architect | Implementation follows, doesn't redesign |
+| # | Agent | Domain | Sole Authority |
+|---|-------|--------|:-:|
+| 1 | **Orchestrator** | Routes, gates, receipts, re-anchoring | |
+| 2 | **Polymath** | Research, ideation, onboarding, translation | |
+| 3 | **Product Manager** | BRD, user stories, acceptance criteria | Requirements |
+| 4 | **Solution Architect** | ADRs, tech stack, API contracts, data models | Architecture |
+| 5 | **Software Engineer** | Handlers, services, repositories, business logic | |
+| 6 | **Frontend Engineer** | Design system, components, pages, accessibility | |
+| 7 | **QA Engineer** | Unit, integration, e2e, performance tests | |
+| 8 | **Security Engineer** | STRIDE, OWASP, PII, dependency scanning | Security |
+| 9 | **Code Reviewer** | Architecture conformance, anti-patterns (adversarial) | Code Quality |
+| 10 | **DevOps** | Docker, Terraform, CI/CD, containers | Infrastructure |
+| 11 | **SRE** | SLOs, chaos engineering, runbooks, capacity | Reliability |
+| 12 | **Data Scientist** | LLM optimization, prompt engineering, cost modeling | |
+| 13 | **Technical Writer** | API reference, dev guides, architecture docs | |
+| 14 | **Skill Maker** | Generates project-specific reusable Claude Code skills | |
 
 ---
 
-## Technology
-
-### Pipeline Architecture
+## What Makes It Different
 
 ```
-DEFINE ──→ BUILD ──→ HARDEN ──→ SHIP ──→ SUSTAIN
-  │          │         │          │         │
-  re-anchor  re-anchor re-anchor  re-anchor re-anchor
-  ↓          ↓         ↓          ↓         ↓
-  receipts   receipts  receipts   receipts  receipts
+  ┌──────────────────────────────────────────────────────────────┐
+  │                                                              │
+  │  RECEIPT ENFORCEMENT          RE-ANCHORING                   │
+  │  ─────────────────            ────────────                   │
+  │  Every agent writes a         Orchestrator re-reads specs    │
+  │  JSON receipt as proof.       FROM DISK at every phase       │
+  │  No receipt = not done.       transition. No context drift   │
+  │  Gate won't open without      in multi-hour runs.            │
+  │  verified artifacts.                                         │
+  │                                                              │
+  │  ADVERSARIAL REVIEW           FRESHNESS PROTOCOL             │
+  │  ──────────────────           ──────────────────             │
+  │  Code reviewer assumes        Agents detect volatile data    │
+  │  code is WRONG until          (model IDs, pricing, CVEs)     │
+  │  proven right. Scales         and WebSearch to verify         │
+  │  from critical-only to        BEFORE implementing.           │
+  │  hostile break scenarios.                                    │
+  │                                                              │
+  │  CONSTRAINT-DRIVEN ARCH       ZERO OPEN-ENDED QUESTIONS      │
+  │  ─────────────────────        ─────────────────────────      │
+  │  Architecture derived from    Every interaction is arrow     │
+  │  YOUR scale, budget, team,    keys + Enter. Polymath         │
+  │  compliance — not templates.  translates at every gate.      │
+  │  100 users → monolith.                                       │
+  │  10M users → microservices.                                  │
+  │                                                              │
+  └──────────────────────────────────────────────────────────────┘
 ```
 
-**Two-wave parallel execution.** Wave A runs build + analysis simultaneously (up to 7+ concurrent agents). Wave B executes against the written code (4+ agents). Analysis tasks like test planning, threat modeling, and SLO definitions start alongside build instead of waiting for code.
+---
 
-**Internal skill parallelism.** 8 skills spawn parallel sub-agents for independent work units: software-engineer (1 agent per service), frontend-engineer (1 agent per page group), qa-engineer (unit/integration/e2e/performance), security-engineer (code/auth/data/supply-chain), code-reviewer (arch/quality/performance), devops (IaC/CI-CD/containers), sre (chaos/incidents/capacity), technical-writer (API ref/dev guides).
+## Protocol Stack
 
-**Dynamic task generation.** The orchestrator reads architecture output (number of services, pages, modules) and creates tasks accordingly. No hardcoded task count.
+All 14 agents load the same 7 protocols at startup:
 
-### 7 Shared Protocols
+```
+  ┌──────────────────────────────────────────────┐
+  │          Receipt Protocol                     │  ← proof of completion
+  ├──────────────────────────────────────────────┤
+  │          Freshness Protocol                   │  ← verify volatile data
+  ├──────────────────────────────────────────────┤
+  │          Visual Identity                      │  ← consistent formatting
+  ├──────────────────────────────────────────────┤
+  │          Conflict Resolution                  │  ← sole-authority domains
+  ├──────────────────────────────────────────────┤
+  │          Tool Efficiency                      │  ← dedicated tools > shell
+  ├──────────────────────────────────────────────┤
+  │          Input Validation                     │  ← classify external inputs
+  ├──────────────────────────────────────────────┤
+  │          UX Protocol                          │  ← structured interactions
+  └──────────────────────────────────────────────┘
+```
 
-Every agent loads the same protocol stack at startup:
+---
 
-| Protocol | Purpose |
-|----------|---------|
-| **UX Protocol** | All user interactions are structured — arrow keys + Enter, never open-ended |
-| **Input Validation** | Classify and validate all external inputs |
-| **Tool Efficiency** | Use dedicated tools over shell commands |
-| **Conflict Resolution** | Sole-authority domains, severity-based dedup |
-| **Visual Identity** | Consistent output formatting — Unicode symbols, container hierarchy, no emoji |
-| **Freshness Protocol** | Detect volatile data, WebSearch before implementing |
-| **Receipt Protocol** | Write JSON receipts as proof of completion, verified at gates |
+## Engagement Modes
 
-### Token-Efficient Design
+Choose your depth at pipeline start. Propagates to all 14 agents.
 
-Large skills use a **router + on-demand phase** pattern. Only the relevant phase loads. Independent phases run as parallel agents, each carrying minimal context.
+```
+  Express     ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  auto-derive, 2-3 questions
+  Standard    ████░░░░░░░░░░░░░░░░░░░░░░░░░░  balanced, 3-5 questions
+  Thorough    █████████████░░░░░░░░░░░░░░░░░░  deep discovery, 5-8 questions
+  Meticulous  ██████████████████████████████░░  full control, 8-12 questions
+```
 
-| Skill | Phases |
-|-------|--------|
-| Polymath | 6 modes: onboard, research, ideate, advise, translate, synthesize |
-| Software Engineer | 5: context, implementation, cross-cutting, integration, local dev |
-| Frontend Engineer | 5: analysis, design system, components, pages, testing/a11y |
-| Security Engineer | 6: threat model, code audit, auth, data, supply chain, remediation |
-| SRE | 5: readiness, SLOs, chaos, incidents, capacity |
-| Data Scientist | 6: audit, LLM optimization, experiments, pipeline, ML infra, cost |
-| Technical Writer | 4: audit, API reference, dev guides, Docusaurus |
+---
 
-### 4 Engagement Modes
+## Token-Efficient Architecture
 
-Choose your interaction depth at pipeline start:
+Large skills split into **router + on-demand phases**. Only what's needed loads. Independent phases run as parallel agents with minimal context.
 
-| Mode | Depth | For |
-|------|-------|-----|
-| **Express** | Minimal interaction, auto-derive everything | Quick tasks, experienced users |
-| **Standard** | Balanced — surface 1-2 critical decisions | Most users |
-| **Thorough** | Deep discovery, trade-off analysis | Complex systems, senior engineers |
-| **Meticulous** | Approve each decision individually | Regulated industries, learning |
-
-Engagement mode propagates to all 14 agents. Express PM asks 2-3 questions. Meticulous PM runs 8-12 across multiple rounds with co-authored acceptance criteria.
+```
+  Polymath ─────────── 6 modes    onboard | research | ideate | advise | translate | synthesize
+  Software Engineer ── 5 phases   context | implement | cross-cutting | integration | local dev
+  Frontend Engineer ── 5 phases   analysis | design system | components | pages | testing
+  Security Engineer ── 6 phases   threat model | code audit | auth | data | supply chain | remediation
+  SRE ─────────────── 5 phases   readiness | SLOs | chaos | incidents | capacity
+  Data Scientist ──── 6 phases   audit | LLM optimization | experiments | pipeline | ML infra | cost
+  Technical Writer ── 4 phases   audit | API reference | dev guides | Docusaurus
+```
 
 ---
 
 ## By the Numbers
 
-| Metric | Value |
-|--------|-------|
-| Specialized agents | 14 |
-| Shared protocols | 7 |
-| Execution modes | 10 |
-| Parallel execution points | 10+ |
-| Approval gates | 3 |
-| Engagement modes | 4 |
-| Execution speed vs sequential | ~3x faster |
-| Token savings from parallelism | ~45% fewer input tokens |
-| Supported languages | TypeScript, Go, Python, Rust, Java/Kotlin |
-| Open-ended questions asked | 0 — every interaction is structured |
+```
+  ┌────────────────────────────────────────────────────┐
+  │                                                     │
+  │   14  specialized agents                            │
+  │    7  shared protocols                              │
+  │   10  execution modes                               │
+  │   10+ parallel execution points                     │
+  │    3  approval gates                                │
+  │    4  engagement modes                              │
+  │   ~3x faster than sequential execution              │
+  │  ~45% fewer input tokens from parallelism           │
+  │    0  open-ended questions — all structured          │
+  │    5  languages: TS, Go, Python, Rust, Java/Kotlin  │
+  │                                                     │
+  └────────────────────────────────────────────────────┘
+```
 
 ---
 
@@ -235,35 +316,28 @@ Engagement mode propagates to all 14 agents. Express PM asks 2-3 questions. Meti
 /plugin marketplace add nagisanzenin/claude-code-plugins
 /plugin install production-grade@nagisanzenin
 
-# Or load directly from source
+# Or from source
 git clone https://github.com/nagisanzenin/claude-code-production-grade-plugin.git
 claude --plugin-dir /path/to/claude-code-production-grade-plugin
 ```
 
 **Requirements:** Claude Code (with plugin support), Docker & Docker Compose, Git.
 
-### Brownfield Support
-
-Works on existing codebases. The orchestrator scans for source files, frameworks, and infrastructure at startup. Creates `.production-grade.yaml` from discovered structure and `codebase-context.md` with safety rules for all agents. No overwriting — extend, don't replace.
+Works on existing codebases — brownfield detection auto-maps your project structure.
 
 ---
 
 ## FAQ
 
-**Does it write working code?**
-Yes. Every agent: write, build, test, debug, fix. No stubs. No TODOs.
+**Does it write working code?** Yes. Write, build, test, debug, fix. No stubs. No TODOs.
 
-**Can I use it on existing projects?**
-Yes. Brownfield detection auto-maps your project. Run specific modes or the full pipeline.
+**Existing projects?** Yes. Brownfield detection auto-maps. Run specific modes or full pipeline.
 
-**How do I know the pipeline actually ran everything?**
-Receipts. Every agent writes a JSON receipt with artifacts and metrics. The orchestrator verifies them at gates.
+**How do I know it ran everything?** Receipts. JSON proof from every agent, verified at gates.
 
-**Does context degrade in long pipeline runs?**
-Not anymore. Re-anchoring re-reads workspace artifacts from disk at every phase transition.
+**Context degrade in long runs?** No. Re-anchoring re-reads from disk at every phase transition.
 
-**What if I'm not technical?**
-Every interaction is multiple choice. Polymath translates technical decisions to plain language at any gate.
+**Not technical?** Every interaction is multiple choice. Polymath translates at any gate.
 
 ---
 
@@ -274,7 +348,7 @@ Every interaction is multiple choice. Polymath translates technical decisions to
 3. Commit changes
 4. Open a Pull Request
 
-**Adding a skill:** Create `skills/your-skill-name/SKILL.md` with `---` frontmatter. For large skills, use the router + phases pattern.
+**Adding a skill:** Create `skills/your-skill-name/SKILL.md` with `---` frontmatter.
 
 ---
 
@@ -297,5 +371,5 @@ MIT
 ---
 
 <p align="center">
-  <strong>14 AI agents. 7 protocols. 10 execution modes. One install.</strong>
+  <strong>14 agents. 7 protocols. 10 modes. One install.</strong>
 </p>
