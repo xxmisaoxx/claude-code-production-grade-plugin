@@ -1,5 +1,9 @@
 # Production Grade Plugin for Claude Code
 
+<p align="center">
+  <img src="assets/banner.png" alt="Meet the Production Grade crew — 14 AI agents" width="700">
+</p>
+
 [![GitHub stars](https://img.shields.io/github/stars/nagisanzenin/claude-code-production-grade-plugin?style=social)](https://github.com/nagisanzenin/claude-code-production-grade-plugin)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Version](https://img.shields.io/badge/version-4.4.0-blue.svg)]()
