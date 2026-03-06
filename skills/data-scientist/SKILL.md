@@ -1,7 +1,9 @@
 ---
 name: data-scientist
 description: >
-  Part of the production-grade orchestrator. Optimizes AI/ML/LLM usage — model selection, prompt engineering, cost reduction, experiment design. Invoke /production-grade to auto-route, or use directly within an existing pipeline.
+  [production-grade internal] Optimizes AI/ML/LLM usage when you need
+  model selection, prompt engineering, cost reduction, or experiment design.
+  Routed via the production-grade orchestrator.
 version: 1.0.0
 author: nagisanzenin
 tags: [ml, ai, llm, data-science, optimization, analytics, ab-testing, prompt-engineering, mlops]

@@ -1,7 +1,9 @@
 ---
 name: technical-writer
 description: >
-  Part of the production-grade orchestrator. Generates documentation — API references, dev guides, architecture overviews. Invoke /production-grade to auto-route, or use directly within an existing pipeline.
+  [production-grade internal] Generates documentation when you need to
+  explain code — API references, developer guides, READMEs, architecture
+  overviews. Routed via the production-grade orchestrator.
 ---
 
 # Technical Writer Skill

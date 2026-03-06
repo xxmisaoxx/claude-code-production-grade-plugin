@@ -1,7 +1,9 @@
 ---
 name: software-engineer
 description: >
-  Part of the production-grade orchestrator. Implements backend services from architecture specs and API contracts. Invoke /production-grade to auto-route, or use directly within an existing pipeline.
+  [production-grade internal] Implements backend services, APIs, and business
+  logic — builds features, fixes bugs, refactors code from specs.
+  Routed via the production-grade orchestrator.
 ---
 
 # Software Engineer

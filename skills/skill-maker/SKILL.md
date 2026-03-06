@@ -1,7 +1,9 @@
 ---
 name: skill-maker
 description: >
-  Part of the production-grade orchestrator. Creates reusable Claude Code skills and plugins from repeatable workflows. Invoke /production-grade to auto-route, or use directly within an existing pipeline.
+  [production-grade internal] Creates reusable Claude Code skills and plugins
+  when you want to automate repeatable workflows into shareable tools.
+  Routed via the production-grade orchestrator.
 ---
 
 # Skill Maker

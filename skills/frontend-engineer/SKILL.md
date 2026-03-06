@@ -1,7 +1,9 @@
 ---
 name: frontend-engineer
 description: >
-  Part of the production-grade orchestrator. Builds production-ready web frontends from BRD user stories and API specs. Invoke /production-grade to auto-route, or use directly within an existing pipeline.
+  [production-grade internal] Builds web frontends — React/Next.js components,
+  pages, design systems, state management, typed API clients.
+  Routed via the production-grade orchestrator.
 ---
 
 # Frontend Engineer

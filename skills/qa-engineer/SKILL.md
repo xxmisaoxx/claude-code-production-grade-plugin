@@ -1,7 +1,9 @@
 ---
 name: qa-engineer
 description: >
-  Part of the production-grade orchestrator. Writes and runs tests — unit, integration, e2e, performance, contract. Invoke /production-grade to auto-route, or use directly within an existing pipeline.
+  [production-grade internal] Writes and runs tests when you want to verify
+  code works — unit, integration, e2e, performance, contract testing.
+  Routed via the production-grade orchestrator.
 ---
 
 # QA Engineer Skill

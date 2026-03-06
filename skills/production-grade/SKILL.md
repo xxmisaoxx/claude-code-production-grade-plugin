@@ -1,12 +1,11 @@
 ---
 name: production-grade
 description: >
-  Use for any software engineering work that benefits from structured,
-  production-quality execution. Routes to the right skills automatically.
-  Full greenfield builds, adding features, hardening existing code,
-  setting up infrastructure, code review, writing tests, documentation,
-  or any combination. If the user is still exploring or uncertain,
-  use polymath first.
+  Orchestrates software engineering work — build apps, add features,
+  fix bugs, refactor code, review PRs, write tests, deploy services,
+  audit security, design architecture, generate docs, optimize performance,
+  debug issues, or explore ideas. Any coding or development request gets
+  routed to the right specialized skills automatically.
 ---
 
 # Production Grade

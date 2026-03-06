@@ -1,7 +1,9 @@
 ---
 name: product-manager
 description: >
-  Part of the production-grade orchestrator. Formalizes ideas into BRD, user stories, and acceptance criteria. Invoke /production-grade to auto-route, or use directly within an existing pipeline.
+  [production-grade internal] Turns product ideas and business goals into
+  formal requirements — BRD, user stories, acceptance criteria, prioritization.
+  Routed via the production-grade orchestrator.
 ---
 
 # Product Manager

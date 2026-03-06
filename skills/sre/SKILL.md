@@ -1,7 +1,9 @@
 ---
 name: sre
 description: >
-  Part of the production-grade orchestrator. Makes deployed systems production-survivable — SLOs, chaos engineering, runbooks, capacity planning. Invoke /production-grade to auto-route, or use directly within an existing pipeline.
+  [production-grade internal] Makes systems reliable in production —
+  SLOs, monitoring, alerting, chaos engineering, incident runbooks,
+  capacity planning. Routed via the production-grade orchestrator.
 ---
 
 # SRE (Site Reliability Engineering) Skill

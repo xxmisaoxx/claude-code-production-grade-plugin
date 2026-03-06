@@ -1,7 +1,9 @@
 ---
 name: security-engineer
 description: >
-  Part of the production-grade orchestrator. Audits code for OWASP/STRIDE compliance, vulnerabilities, and data protection. Invoke /production-grade to auto-route, or use directly within an existing pipeline.
+  [production-grade internal] Audits code for security vulnerabilities —
+  OWASP top 10, auth flaws, injection, data exposure, dependency risks.
+  Routed via the production-grade orchestrator.
 ---
 
 # Security Engineer

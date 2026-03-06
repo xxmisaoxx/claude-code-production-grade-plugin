@@ -1,7 +1,9 @@
 ---
 name: solution-architect
 description: >
-  Part of the production-grade orchestrator. Designs system architecture — tech stack, API contracts, data models, ADRs — derived from project constraints. Invoke /production-grade to auto-route, or use directly within an existing pipeline.
+  [production-grade internal] Designs system architecture when you need to
+  decide tech stack, API contracts, data models, or infrastructure shape.
+  Routed via the production-grade orchestrator.
 ---
 
 # Solution Architect

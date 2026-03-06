@@ -1,7 +1,9 @@
 ---
 name: devops
 description: >
-  Part of the production-grade orchestrator. Containerizes, deploys, and builds CI/CD infrastructure for existing code. Invoke /production-grade to auto-route, or use directly within an existing pipeline.
+  [production-grade internal] Sets up deployment and infrastructure —
+  Docker, CI/CD pipelines, cloud provisioning, environment configuration.
+  Routed via the production-grade orchestrator.
 ---
 
 # DevOps

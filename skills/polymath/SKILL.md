@@ -1,7 +1,9 @@
 ---
 name: polymath
 description: >
-  Part of the production-grade orchestrator. Thinking partner for exploration, research, and decision-making when the user needs clarity before action. Invoke /production-grade to auto-route, or use directly within an existing pipeline.
+  [production-grade internal] Thinking partner when you're unsure what to
+  build or how — explores ideas, researches options, helps decide before
+  committing to code. Routed via the production-grade orchestrator.
 ---
 
 # Polymath

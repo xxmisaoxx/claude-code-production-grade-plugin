@@ -1,7 +1,10 @@
 ---
 name: code-reviewer
 description: >
-  Part of the production-grade orchestrator. Reviews code for architecture conformance, quality patterns, and performance. Read-only — produces findings, never modifies code. Invoke /production-grade to auto-route, or use directly within an existing pipeline.
+  [production-grade internal] Reviews code for quality — architecture
+  conformance, anti-patterns, performance issues, maintainability.
+  Read-only analysis, never modifies code.
+  Routed via the production-grade orchestrator.
 ---
 
 # Code Reviewer Skill
