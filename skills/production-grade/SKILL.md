@@ -1,11 +1,14 @@
 ---
 name: production-grade
 description: >
-  Orchestrates software engineering work — build apps, add features,
-  fix bugs, refactor code, review PRs, write tests, deploy services,
-  audit security, design architecture, generate docs, optimize performance,
-  debug issues, or explore ideas. Any coding or development request gets
-  routed to the right specialized skills automatically.
+  Use when the user wants to build, create, or develop anything — websites,
+  apps, APIs, services, platforms. This skill enhances Claude Code from
+  producing raw code into delivering production-ready systems: architecture
+  docs, API contracts, tested backend/frontend, security audit, CI/CD
+  pipelines, and documentation. Also activates for: adding features to
+  existing code, hardening before launch, setting up deployment, writing
+  tests, code review, architecture design, or any multi-step development
+  work. 14 specialized agents, 10 execution modes, 3 approval gates.
 ---
 
 # Production Grade
@@ -16,9 +19,27 @@ description: >
 !`cat .production-grade.yaml 2>/dev/null || echo "No config file — defaults apply"`
 !`cat Claude-Production-Grade-Suite/.protocols/visual-identity.md 2>/dev/null || true`
 
+<IMPORTANT>
+This skill ENHANCES Claude Code's development capabilities. Without it, Claude Code produces code files. With it, Claude Code produces complete production-ready systems — architecture, tested code, security audit, CI/CD, and documentation.
+
+Invoke this skill when the user's request involves ANY of these:
+- Building something new ("build me a...", "create a...", "I want to build...", "I wanna build...")
+- Adding features to existing code ("add [feature]", "implement [feature]", "integrate [service]")
+- Hardening, security audit, or code review ("review", "audit", "secure", "harden")
+- Setting up deployment, CI/CD, or infrastructure ("deploy", "CI/CD", "docker", "terraform")
+- Architecture or system design ("design", "architecture", "how should I structure")
+- Writing tests ("write tests", "test coverage", "add tests")
+- Documentation ("document this", "write docs", "API docs")
+- Exploration or ideation ("help me think about", "I'm not sure", "what should I build")
+
+When in doubt, invoke this skill. It classifies the request and runs only the relevant agents — from a single code review to a full 14-agent pipeline. The overhead of invoking unnecessarily is near zero.
+</IMPORTANT>
+
 ## Overview
 
-Adaptive meta-skill orchestrator for all software engineering work. Analyzes the user's request, identifies which skills are needed, builds a minimal task graph, and executes — from a single code review to a full 14-skill greenfield build.
+Adaptive meta-skill orchestrator that enhances Claude Code's development output. Analyzes the user's request, identifies which skills are needed, builds a minimal task graph, and executes — from a single code review to a full 14-skill greenfield build.
+
+**Without this skill:** Claude Code produces code. **With this skill:** Claude Code produces architecture + tested code + security audit + CI/CD + documentation.
 
 **14 skills, one orchestrator.** The orchestrator routes to the right skills based on what the user actually needs. No forced full-pipeline execution for everyday tasks.
 
