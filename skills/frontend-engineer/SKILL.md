@@ -111,7 +111,7 @@ This skill runs as Phase 3b in the production-grade pipeline, in parallel with S
 | 3 | phases/03-components.md | After Phase 2 | UI primitives, layout components, feature components, accessibility |
 | 4 | phases/04-pages-routes.md | After Phase 3 | Page layouts, routing, auth guards, state management, API client layer |
 | 4b | (inline — see Functional Completeness below) | After Phase 4 | Dead element scan, navigation graph, interaction trace, cross-agent reconciliation |
-| 5 | phases/05-design-polish.md | After Phase 4b verified | **Design research, color theory, typography, micro-interactions, visual polish** |
+| 5 | phases/05-design-polish.md | After Phase 4b verified | **MUST ask user for style preset FIRST (Creative/Elegance/High Tech/Corporate). Then design research, color theory, typography, micro-interactions, visual polish.** |
 | 6 | phases/06-testing-a11y.md | After Phase 5 | Component tests, e2e tests, accessibility audit, performance budget, Storybook |
 
 ## Dispatch Protocol

@@ -1,5 +1,32 @@
 # Phase 5: Design & Polish
 
+## STOP — ASK THE USER BEFORE DOING ANYTHING
+
+**Do NOT start implementing. Do NOT start researching. Do NOT touch any files.**
+
+The FIRST action in this phase is to ask the user which visual style they want. Use AskUserQuestion IMMEDIATELY:
+
+```
+Which visual style do you want for the frontend?
+
+> Creative — Colorful, captivating visuals, bold gradients, expressive typography,
+             rich imagery, delightful micro-animations. Makes your heart melt.
+  Elegance — Minimalist, sleek, Apple-inspired. Generous whitespace, restrained palette,
+             premium feel, typography-driven, every pixel intentional.
+  High Tech — For geeks. Neat boxed layouts, monospace accents, terminal aesthetics,
+              dark-mode-first, data-dense, IT/dev theme, subtle grid lines.
+  Corporate — Formal, professional, trustworthy. Conservative palette, clear hierarchy,
+              structured layouts, no surprises. Enterprise-ready.
+  Custom — I'll describe what I want
+  Chat about this
+```
+
+**Wait for the user's response. Do NOT proceed until they answer.**
+
+The selected style becomes the **design directive** that drives ALL subsequent decisions in this phase.
+
+---
+
 ## Objective
 
 The frontend is functional — every button works, every link resolves, every form submits, navigation is complete. NOW make it beautiful. This phase transforms a working but generic frontend into a visually polished, domain-appropriate, professionally designed application.
@@ -9,10 +36,6 @@ The frontend is functional — every button works, every link resolves, every fo
 ## Prerequisites
 
 Phase 4b (Functional Verification) MUST be complete. Every interactive element works. Do NOT polish a broken frontend.
-
-## 5.0 Style Selection (Ask User First)
-
-**Before any design research, ask the user which visual style they want.** Use AskUserQuestion with these options:
 
 ```
 > Creative — Colorful, captivating visuals, bold gradients, expressive typography,
