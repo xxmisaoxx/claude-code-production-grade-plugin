@@ -10,35 +10,63 @@ The frontend is functional — every button works, every link resolves, every fo
 
 Phase 4b (Functional Verification) MUST be complete. Every interactive element works. Do NOT polish a broken frontend.
 
+## 5.0 Style Selection (Ask User First)
+
+**Before any design research, ask the user which visual style they want.** Use AskUserQuestion with these options:
+
+```
+> Creative — Colorful, captivating visuals, bold gradients, expressive typography,
+             rich imagery, delightful micro-animations. Makes your heart melt.
+  Elegance — Minimalist, sleek, Apple-inspired. Generous whitespace, restrained palette,
+             premium feel, typography-driven, every pixel intentional.
+  High Tech — For geeks. Neat boxed layouts, monospace accents, terminal aesthetics,
+              dark-mode-first, data-dense, IT/dev theme, subtle grid lines.
+  Corporate — Formal, professional, trustworthy. Conservative palette, clear hierarchy,
+              structured layouts, no surprises. Enterprise-ready.
+  Custom — I'll describe what I want
+  Chat about this
+```
+
+The selected style becomes the **design directive** that drives ALL subsequent decisions in this phase. Every choice below (colors, typography, spacing, interactions) must align with the selected style.
+
+### Style Reference Guide
+
+| Style | Colors | Typography | Spacing | Interactions | Dark Mode |
+|-------|--------|-----------|---------|-------------|-----------|
+| **Creative** | Vibrant primaries, bold gradients, accent pops, complementary combos | Expressive — mix display + body fonts, varied weights, large headings | Generous but dynamic — asymmetric layouts, overlapping elements OK | Rich — animated transitions, hover transformations, parallax, delightful loading states | Vivid — saturated colors on dark backgrounds, glow effects |
+| **Elegance** | Restrained — 1-2 neutral tones + one subtle accent, monochromatic scales | Premium sans-serif (SF Pro, Inter, Helvetica Neue), thin/light weights, precise sizing | Very generous — whitespace IS the design, breathing room everywhere | Subtle — smooth fades, gentle scaling, understated hover states, nothing flashy | Refined — deep charcoal backgrounds, muted text, thin borders |
+| **High Tech** | Cool tones — slate/zinc/cyan, neon accents optional, matrix-green or electric-blue | Monospace for data/labels (JetBrains Mono, Fira Code), clean sans for body | Tight and structured — grid-aligned, uniform gutters, dense information | Precise — snappy transitions, no bounce, terminal-style cursor blinks, status indicators | Default — dark IS the primary mode, light mode is secondary |
+| **Corporate** | Conservative — navy, slate, white. One brand color. Muted success/warning/error | System or professional sans (Inter, Roboto, Segoe UI), regular weights, standard sizes | Structured — consistent 8px grid, clear section breaks, standard card padding | Minimal — basic hover highlights, standard focus rings, no animations beyond necessary | Optional — light mode primary, dark mode if requested |
+
 ## 5.1 Domain Research (WebSearch Required)
 
-Before touching any design tokens, research:
+Combine the user's **selected style** with domain-specific research:
 
-1. **Domain visual benchmarks** — WebSearch for the top 3-5 products in the same domain as the BRD. What do they look like? What visual language do they use?
-   - Fintech/banking → clean, trustworthy, blue/green, lots of whitespace, data-dense dashboards
-   - E-commerce → vibrant, product-focused, high-contrast CTAs, image-heavy
-   - Developer tools → dark mode default, monospace accents, technical, information-dense
-   - Healthcare → soft, accessible, calming blues/greens, large touch targets
-   - Consumer social → playful, colorful, rounded, motion-rich, personality-driven
-   - Enterprise B2B → professional, neutral, data-focused, dense but organized
-   - Creative/design → bold, expressive, unique typography, visual storytelling
+1. **Style + domain intersection** — WebSearch for "{selected style} {domain} web design" (e.g., "elegant fintech dashboard design", "high-tech developer tool UI"). Find examples that match BOTH the style directive and the product domain.
 
-2. **Current design trends** — WebSearch for "web design trends {current year}" and "{domain} dashboard design {current year}". Note patterns that are current vs dated.
+2. **Visual benchmarks** — WebSearch for the top 3-5 products in the same domain. Filter through the lens of the selected style — which competitors match the desired aesthetic? Which elements can we adopt?
 
-3. **Competitive analysis** — What do direct competitors look like? Where can we match? Where can we differentiate?
+3. **Current trends** — WebSearch for "web design trends {current year}" filtered to the selected style category. What's current? What's dated?
 
-Document findings in `Claude-Production-Grade-Suite/frontend-engineer/docs/design-research.md`.
+4. **Style-specific inspiration** — Search for design references matching the style:
+   - **Creative** → Dribbble, Awwwards, trending colorful SaaS designs
+   - **Elegance** → Apple.com, Linear, Stripe, minimalist design showcases
+   - **High Tech** → Vercel, GitHub, terminal-inspired UIs, developer tool dashboards
+   - **Corporate** → Salesforce, HubSpot, enterprise dashboard patterns
+
+Document findings in `Claude-Production-Grade-Suite/frontend-engineer/docs/design-research.md` including the selected style and how it maps to the domain.
 
 ## 5.2 Color Theory
 
-Upgrade the default blue palette to a researched, domain-appropriate color system:
+Upgrade the default blue palette to a color system that matches the **selected style** and domain:
 
 ### Primary Color Selection
 
-Choose based on:
-- **Product personality** from BRD (trustworthy? innovative? playful? professional?)
-- **Domain conventions** (fintech → blue/green, health → blue/teal, creative → purple/orange)
-- **Color psychology:**
+Choose based on (in priority order):
+1. **Selected style directive** — Creative demands vibrancy, Elegance demands restraint, High Tech demands cool precision, Corporate demands conservative authority
+2. **Product personality** from BRD (trustworthy? innovative? playful? professional?)
+3. **Domain conventions** (fintech → blue/green, health → blue/teal, creative → purple/orange)
+4. **Color psychology:**
   - Blue → trust, stability, professionalism
   - Green → growth, health, money, nature
   - Purple → creativity, luxury, innovation
@@ -59,7 +87,13 @@ Neutral    → 50-950 scale (grays — warm or cool depending on primary)
 Semantic   → success (green), warning (amber), danger (red), info (blue)
 ```
 
-Rules:
+Style-specific color rules:
+- **Creative** — Use gradients freely. 2-3 vibrant primaries. Bold complementary or triadic combos. Accent should be eye-catching.
+- **Elegance** — Maximum 2 colors + neutrals. One subtle accent. Monochromatic scales. Restraint is the point.
+- **High Tech** — Cool neutrals (slate/zinc). One electric accent (cyan, green, blue). Dark surfaces. Minimal color variation.
+- **Corporate** — One brand primary (navy, blue). Neutral supporting. Muted semantics. No gradients. No surprises.
+
+Universal rules:
 - Primary and secondary must have sufficient contrast when used together
 - Accent color must pop against both light and dark backgrounds
 - Neutral grays should have a slight warm or cool tint matching the primary (pure gray looks dead)
@@ -78,11 +112,11 @@ Rules:
 Upgrade from system fonts to a considered type system:
 
 1. **WebSearch** for current popular font pairings for the domain
-2. Choose a heading font and body font (can be the same family at different weights):
-   - **SaaS/Dashboard** → Inter, Geist, or similar clean sans-serif
-   - **Marketing/Consumer** → Wider variety — consider personality fit
-   - **Developer tools** → JetBrains Mono or similar monospace for code, clean sans for UI
-   - **Enterprise** → Conservative — Inter, Roboto, or system fonts
+2. Choose fonts guided by the **selected style**:
+   - **Creative** → Expressive fonts. Mix display + body. Consider: Clash Display, Cabinet Grotesk, Satoshi, Plus Jakarta Sans. Bold heading weights.
+   - **Elegance** → Premium sans-serif. Consider: SF Pro, Inter (light/regular weights), Helvetica Neue, Manrope. Thin weights for large text.
+   - **High Tech** → Monospace for labels/data (JetBrains Mono, Fira Code, Berkeley Mono). Clean sans for body (Geist, Inter). Terminal vibes.
+   - **Corporate** → Conservative and readable. Inter, Roboto, Segoe UI, or system fonts. Regular weights. Nothing fancy.
 
 3. **Type hierarchy:**
    - Clear visual distinction between h1-h6 (not just size — weight and spacing matter)
@@ -109,21 +143,25 @@ Apply design principles to make information scannable and actions obvious:
 
 ## 5.5 Micro-Interactions & Feedback
 
-Add the polish that makes a UI feel alive:
+Interaction richness scales with the selected style:
 
-1. **Hover states** — Every clickable element has a visible hover state (background shift, subtle shadow, or opacity change). Not just cursor:pointer.
+**All styles (mandatory):**
+1. **Hover states** — Every clickable element has a visible hover state. Not just cursor:pointer.
+2. **Active/pressed states** — Buttons feel pressed (scale down slightly, darken).
+3. **Focus states** — Visible focus ring styled to match design. Critical for accessibility.
+4. **Loading feedback** — Buttons show spinner during API calls. Forms disable during submission. Skeletons match layout.
+5. **Success/error feedback** — Toasts for async results. Inline form validation. Optimistic updates.
 
-2. **Active/pressed states** — Buttons should feel pressed (scale down slightly, darken).
+**Style-scaled interactions:**
 
-3. **Focus states** — Visible focus ring (not browser default — styled to match design). Critical for accessibility.
-
-4. **Transitions** — Smooth transitions on color, background, shadow, transform. 150ms for micro-interactions, 300ms for layout changes. Use ease-out for entering, ease-in for exiting.
-
-5. **Loading feedback** — Buttons show loading spinner when clicked and waiting for API. Forms disable during submission. Skeleton screens match the actual content layout.
-
-6. **Success/error feedback** — Toast notifications for async results. Inline validation for forms (green checkmark for valid, red text for errors). Optimistic updates with rollback for fast perceived performance.
-
-7. **Page transitions** — Subtle fade or slide between routes (respect prefers-reduced-motion).
+| Interaction | Creative | Elegance | High Tech | Corporate |
+|-------------|----------|----------|-----------|-----------|
+| Transitions | Bold — scale, rotate, gradient shifts, 300-500ms | Subtle — gentle fades, 200-300ms, ease-in-out | Snappy — instant or 100-150ms, linear, no bounce | Basic — 150ms color change, nothing more |
+| Page transitions | Animated — slide, fade, shared element transitions | Refined — smooth crossfade, content stagger | None or instant — no wasted motion | None — instant route changes |
+| Hover effects | Transformative — elevation, color shift, glow, scale | Minimal — subtle background tint, thin underline | Precise — border highlight, background darken | Standard — background highlight only |
+| Loading states | Playful — branded animations, skeleton with shimmer | Clean — minimal skeleton, thin progress line | Technical — progress percentage, status text, dots | Standard — spinner, skeleton |
+| Empty states | Illustrated — custom illustrations, inviting copy | Typographic — elegant text, single subtle icon | Data-styled — formatted "no results" with filters | Functional — clear message, primary CTA |
+| Notifications | Animated toasts with icons and color | Understated inline messages | Console-style status updates | Standard alert banners |
 
 ## 5.6 Dark Mode Polish
 
@@ -179,4 +217,11 @@ Before moving to Phase 6 (Testing):
 
 ## Quality Bar
 
-"Default blue with system fonts" is NOT production-grade. "Researched indigo palette matching fintech trust conventions, Inter for UI / JetBrains Mono for data, 8px spacing rhythm, animated state transitions, polished dark mode with proper surface hierarchy" — that is production-grade.
+"Default blue with system fonts" is NOT production-grade.
+
+- **Creative**: "Vibrant purple-to-pink gradient primary, Cabinet Grotesk headings, animated page transitions, illustrated empty states, glow-on-hover cards, dark mode with saturated accents"
+- **Elegance**: "Monochromatic slate palette with one rose accent, SF Pro at light/regular weights, 32px section spacing, fade-only transitions, deep charcoal dark mode with muted text"
+- **High Tech**: "Zinc surfaces, cyan-500 accent, JetBrains Mono for all data labels, 4px grid-aligned layouts, instant transitions, dark-mode-first with subtle grid lines"
+- **Corporate**: "Navy-700 primary, Inter at regular weight, 8px consistent grid, no animations, standard card elevation, optional light-only theme"
+
+THAT is production-grade — intentional design that matches the user's chosen style.
