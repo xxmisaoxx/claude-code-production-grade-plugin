@@ -57,9 +57,40 @@ Read `.production-grade.yaml` to determine:
 - `project.architecture` → monolith vs microservices (affects containerization)
 - `paths.services`, `paths.frontend`, `paths.shared_libs` → output locations
 
+## Worktree Pre-Flight
+
+Before launching parallel agents, check if worktree isolation is available:
+
+```python
+# Check for clean git state (worktrees require committed state)
+result = Bash("git status --porcelain 2>/dev/null | head -5")
+if result.strip():
+  # Dirty repo — ask user
+  AskUserQuestion(questions=[{
+    "question": "Parallel agents work best with worktree isolation, but you have uncommitted changes.",
+    "header": "Worktree Isolation",
+    "options": [
+      {"label": "Auto-commit and use worktrees (Recommended)", "description": "Commit current state, isolate each agent in its own worktree"},
+      {"label": "Skip worktrees — run in shared directory", "description": "Agents share the working directory (risk of file conflicts)"},
+      {"label": "Chat about this", "description": "Free-form input"}
+    ],
+    "multiSelect": False
+  }])
+  # If auto-commit: git add -A && git commit -m "production-grade: pre-BUILD checkpoint"
+  # If skip: set use_worktrees = False
+else:
+  use_worktrees = True
+```
+
+Store the worktree decision in `Claude-Production-Grade-Suite/.orchestrator/settings.md` by appending:
+```
+Worktrees: [enabled|disabled]
+```
+
 ## PARALLEL #1: T3a + T3b
 
-Spawn backend and frontend agents simultaneously as background Agents:
+Spawn backend and frontend agents simultaneously as background Agents.
+When `use_worktrees` is True, add `isolation="worktree"` to each Agent call. Each agent gets its own isolated copy of the repo — no file race conditions.
 
 ```python
 # T3a: Backend Engineering
@@ -73,10 +104,11 @@ Invoke the software-engineer skill pattern.
 Write services to project root: services/, libs/shared/
 Write workspace artifacts to: Claude-Production-Grade-Suite/software-engineer/
 TDD enforced: write test → watch fail → implement → watch pass → refactor.
-When complete, write a receipt JSON to Claude-Production-Grade-Suite/.orchestrator/receipts/T3a-software-engineer.json with task, agent, phase, status, artifacts, metrics, verification. Then mark your task as completed.""",
+When complete, write a receipt JSON to Claude-Production-Grade-Suite/.orchestrator/receipts/T3a-software-engineer.json with task, agent, phase, status, artifacts, metrics, effort, verification. Then mark your task as completed.""",
   subagent_type="general-purpose",
   mode="bypassPermissions",
-  run_in_background=True
+  run_in_background=True,
+  isolation="worktree"  # Remove this line if use_worktrees is False
 )
 
 # T3b: Frontend Engineering (skip if features.frontend is false)
@@ -90,10 +122,11 @@ Read .production-grade.yaml for framework and styling preferences.
 Invoke the frontend-engineer skill pattern.
 Write frontend to project root: frontend/
 Write workspace artifacts to: Claude-Production-Grade-Suite/frontend-engineer/
-When complete, write a receipt JSON to Claude-Production-Grade-Suite/.orchestrator/receipts/T3b-frontend-engineer.json with task, agent, phase, status, artifacts, metrics, verification. Then mark your task as completed.""",
+When complete, write a receipt JSON to Claude-Production-Grade-Suite/.orchestrator/receipts/T3b-frontend-engineer.json with task, agent, phase, status, artifacts, metrics, effort, verification. Then mark your task as completed.""",
   subagent_type="general-purpose",
   mode="bypassPermissions",
-  run_in_background=True
+  run_in_background=True,
+  isolation="worktree"  # Remove this line if use_worktrees is False
 )
 ```
 
@@ -103,6 +136,7 @@ T4 begins containerization as soon as backend is done, even if frontend is still
 
 ```python
 # Wait for T3a completion (check TaskList or receive agent result)
+# If T3a used worktree: merge its branch first so T4 sees the code
 TaskUpdate(taskId=t4_id, status="in_progress")
 Agent(
   prompt="""You are the DevOps Containerization Engineer.
@@ -112,18 +146,40 @@ Read .production-grade.yaml for paths and preferences.
 Write Dockerfiles per service, docker-compose.yml at project root.
 Write workspace artifacts to: Claude-Production-Grade-Suite/devops/containers/
 Validate: docker build succeeds for each service, docker-compose up starts all.
-When complete, write a receipt JSON to Claude-Production-Grade-Suite/.orchestrator/receipts/T4-devops.json with task, agent, phase, status, artifacts, metrics, verification. Then mark your task as completed.""",
+When complete, write a receipt JSON to Claude-Production-Grade-Suite/.orchestrator/receipts/T4-devops.json with task, agent, phase, status, artifacts, metrics, effort, verification. Then mark your task as completed.""",
   subagent_type="general-purpose",
   mode="bypassPermissions",
-  run_in_background=True
+  run_in_background=True,
+  isolation="worktree"  # Remove this line if use_worktrees is False
 )
 ```
+
+## Worktree Merge-Back
+
+If worktrees were used, merge each agent's branch back to the working branch after the wave completes:
+
+```python
+# For each completed agent that used a worktree:
+# The Agent result includes the worktree branch name.
+# Merge each branch in sequence (should be conflict-free — agents write to different directories).
+for branch in worktree_branches:
+  Bash(f"git merge --no-ff {branch} -m 'production-grade: merge {branch}'")
+  Bash(f"git branch -d {branch}")  # Clean up merged branch
+
+# If any merge has conflicts:
+#   1. Run: git merge --abort
+#   2. Escalate to user via AskUserQuestion
+#   3. Offer: "Resolve conflicts manually" or "Retry without worktrees"
+```
+
+After merging, all agent outputs are unified in the working directory.
 
 ## Completion
 
 When all BUILD tasks complete:
-1. **Verify receipts:** Read all BUILD receipts from `.orchestrator/receipts/` (T3a, T3b, T4). Verify all listed artifacts exist on disk.
-2. **Re-anchor:** Re-read from disk before transitioning to HARDEN:
+1. **Merge worktree branches** (if worktrees enabled) — see Worktree Merge-Back above.
+2. **Verify receipts:** Read all BUILD receipts from `.orchestrator/receipts/` (T3a, T3b, T4). Verify all listed artifacts exist on disk.
+3. **Re-anchor:** Re-read from disk before transitioning to HARDEN:
    - Directory listing of `services/`, `frontend/`, `libs/shared/` (what was actually built)
    - `Claude-Production-Grade-Suite/solution-architect/system-design.md` (architecture reference for HARDEN agents)
 3. Verify all services compile and start

@@ -24,6 +24,8 @@ Use this freshly-read data when writing agent task prompts below.
 
 All three start together:
 
+Read `Claude-Production-Grade-Suite/.orchestrator/settings.md` to check if `Worktrees: enabled`. If enabled, add `isolation="worktree"` to each Agent call below.
+
 ```python
 # T5: QA Testing
 TaskUpdate(taskId=t5_id, status="in_progress")
@@ -36,10 +38,11 @@ Write tests to project root: tests/
 Write workspace artifacts to: Claude-Production-Grade-Suite/qa-engineer/
 Run integration, e2e, and performance tests.
 Distinguish test bugs (fix immediately) from implementation bugs (log as findings).
-When complete, write a receipt JSON to Claude-Production-Grade-Suite/.orchestrator/receipts/T5-qa-engineer.json with task, agent, phase, status, artifacts, metrics, verification. Then mark your task as completed.""",
+When complete, write a receipt JSON to Claude-Production-Grade-Suite/.orchestrator/receipts/T5-qa-engineer.json with task, agent, phase, status, artifacts, metrics, effort, verification. Then mark your task as completed.""",
   subagent_type="general-purpose",
   mode="bypassPermissions",
-  run_in_background=True
+  run_in_background=True,
+  isolation="worktree"  # Omit if Worktrees: disabled
 )
 
 # T6a: Security Audit (SOLE OWASP AUTHORITY)
@@ -53,10 +56,11 @@ Perform STRIDE threat modeling + OWASP Top 10 audit + dependency scan.
 Write findings to: Claude-Production-Grade-Suite/security-engineer/
 Auto-fix Critical/High issues with regression tests.
 Document Medium/Low for remediation plan.
-When complete, write a receipt JSON to Claude-Production-Grade-Suite/.orchestrator/receipts/T6a-security-engineer.json with task, agent, phase, status, artifacts, metrics, verification. Then mark your task as completed.""",
+When complete, write a receipt JSON to Claude-Production-Grade-Suite/.orchestrator/receipts/T6a-security-engineer.json with task, agent, phase, status, artifacts, metrics, effort, verification. Then mark your task as completed.""",
   subagent_type="general-purpose",
   mode="bypassPermissions",
-  run_in_background=True
+  run_in_background=True,
+  isolation="worktree"  # Omit if Worktrees: disabled
 )
 
 # T6b: Code Review (NO OWASP — architecture + quality only)
@@ -72,10 +76,11 @@ Review: SOLID/DRY/KISS, performance, N+1 queries, resource leaks, test quality.
 Write findings to: Claude-Production-Grade-Suite/code-reviewer/
 READ-ONLY: produce findings only, do NOT modify source code.
 ADVERSARIAL STANCE: Your job is to find where this code breaks, not confirm it works. Assume every function has an edge case, every endpoint accepts bad input, every concurrent operation has a race condition. Hunt for the bugs the author can't see.
-When complete, write a receipt JSON to Claude-Production-Grade-Suite/.orchestrator/receipts/T6b-code-reviewer.json with task, agent, phase, status, artifacts, metrics, verification. Then mark your task as completed.""",
+When complete, write a receipt JSON to Claude-Production-Grade-Suite/.orchestrator/receipts/T6b-code-reviewer.json with task, agent, phase, status, artifacts, metrics, effort, verification. Then mark your task as completed.""",
   subagent_type="general-purpose",
   mode="bypassPermissions",
-  run_in_background=True
+  run_in_background=True,
+  isolation="worktree"  # Omit if Worktrees: disabled
 )
 ```
 
@@ -91,6 +96,17 @@ Print pipeline dashboard with HARDEN ● active on phase start. Then print wave 
 │                                                     │
 │  All agents launched. Working autonomously...       │
 └─────────────────────────────────────────────────────┘
+```
+
+## Worktree Merge-Back
+
+If worktrees were used, merge each HARDEN agent's branch back after the wave completes:
+
+```python
+for branch in harden_worktree_branches:
+  Bash(f"git merge --no-ff {branch} -m 'production-grade: merge {branch}'")
+  Bash(f"git branch -d {branch}")
+# If merge conflicts: git merge --abort, escalate to user
 ```
 
 ## Post-HARDEN: Receipt Verification & Remediation Preparation

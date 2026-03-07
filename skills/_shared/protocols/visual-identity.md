@@ -273,6 +273,39 @@ The indented detail under Critical/High and the `—` for lower severities creat
 
 ---
 
+## Pipeline Cost Dashboard
+
+Show estimated effort in the final summary. Aggregate `effort` fields from all receipts.
+
+### In Final Summary (inside Tier 1 box)
+
+```
+║   Cost       {N} agents · {M} total tool calls · {K} files processed  ║
+║              Est. {X}K-{Y}K tokens · ~${A}-${B} at current pricing    ║
+```
+
+### Cost Estimation Table (used by orchestrator)
+
+Estimate tokens from mode × engagement × project complexity:
+
+| Mode | Express | Standard | Thorough | Meticulous |
+|------|---------|----------|----------|------------|
+| Full Build | 150-300K | 300-500K | 500-800K | 800K-1.2M |
+| Feature | 30-80K | 50-150K | 100-250K | 200-400K |
+| Harden | 40-100K | 80-200K | 150-350K | 300-500K |
+| Ship | 30-80K | 60-150K | 100-250K | 200-350K |
+| Test | 15-40K | 30-80K | 60-150K | 100-250K |
+| Review | 10-30K | 20-50K | 40-100K | 80-200K |
+| Architect | 20-50K | 40-100K | 80-200K | 150-350K |
+
+Show the pre-pipeline estimate after engagement mode selection:
+```
+  Est. cost: ~300-500K tokens ($0.90-$2.50 at Sonnet pricing)
+  Agents: up to 7 concurrent · 13 total tasks
+```
+
+---
+
 ## Before/After Patterns
 
 For remediation and any transformation, show the delta:

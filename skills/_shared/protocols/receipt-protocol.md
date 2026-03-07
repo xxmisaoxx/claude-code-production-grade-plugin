@@ -29,6 +29,11 @@ Every agent writes a JSON receipt as its LAST action before `TaskUpdate(status="
     "findings_medium": 12,
     "findings_low": 8
   },
+  "effort": {
+    "files_read": 47,
+    "files_written": 6,
+    "tool_calls": 83
+  },
   "verification": "all 4 review phases executed, review-report.md written with executive summary"
 }
 ```
@@ -43,6 +48,7 @@ Every agent writes a JSON receipt as its LAST action before `TaskUpdate(status="
 | `status` | string | Always `"complete"` — only write receipt on success |
 | `artifacts` | string[] | Every file the agent created or modified. Each path MUST exist on disk at time of writing. |
 | `metrics` | object | Key-value pairs with concrete numbers. At least one metric required. No empty objects. |
+| `effort` | object | Tracking: `files_read` (int), `files_written` (int), `tool_calls` (int). Count your actual tool invocations during this task. |
 | `verification` | string | One-line summary of what the agent checked to confirm its work is correct. |
 
 ---
@@ -116,3 +122,4 @@ At every phase transition and before every gate, the orchestrator:
 | `"verification": "done"` | Describe what was actually verified |
 | Skipping receipt because "it's a small task" | Every task gets a receipt, regardless of size |
 | Writing receipt but not checking artifacts exist | Verify each artifact path before writing receipt |
+| `"effort": {}` or missing effort field | Count files_read, files_written, tool_calls from your actual work |

@@ -51,6 +51,8 @@ Use this freshly-read data when writing agent task prompts below.
 
 ## PARALLEL #5: T7 + T8
 
+Read `Claude-Production-Grade-Suite/.orchestrator/settings.md` to check if `Worktrees: enabled`. If enabled, add `isolation="worktree"` to each Agent call below.
+
 ```python
 # T7: DevOps IaC + CI/CD
 TaskUpdate(taskId=t7_id, status="in_progress")
@@ -66,10 +68,11 @@ Write workspace artifacts to: Claude-Production-Grade-Suite/devops/
 DO NOT define SLOs — add placeholder: "SLO thresholds defined by SRE."
 DO NOT write runbooks — SRE writes runbooks to docs/runbooks/.
 Validate: terraform validate, pipeline syntax lint.
-When complete, write a receipt JSON to Claude-Production-Grade-Suite/.orchestrator/receipts/T7-devops.json with task, agent, phase, status, artifacts, metrics, verification. Then mark your task as completed.""",
+When complete, write a receipt JSON to Claude-Production-Grade-Suite/.orchestrator/receipts/T7-devops.json with task, agent, phase, status, artifacts, metrics, effort, verification. Then mark your task as completed.""",
   subagent_type="general-purpose",
   mode="bypassPermissions",
-  run_in_background=True
+  run_in_background=True,
+  isolation="worktree"  # Omit if Worktrees: disabled
 )
 
 # T8: Remediation (fix HARDEN findings)
@@ -85,10 +88,11 @@ For each finding:
   4. Re-scan the affected code
 If findings persist after 2 fix-rescan cycles → document and escalate.
 Medium/Low findings: document but do not block.
-When complete, write a receipt JSON to Claude-Production-Grade-Suite/.orchestrator/receipts/T8-remediation.json with task, agent, phase, status, artifacts (files modified), metrics (findings_fixed, findings_remaining), verification. Then mark your task as completed.""",
+When complete, write a receipt JSON to Claude-Production-Grade-Suite/.orchestrator/receipts/T8-remediation.json with task, agent, phase, status, artifacts (files modified), metrics (findings_fixed, findings_remaining), effort, verification. Then mark your task as completed.""",
   subagent_type="general-purpose",
   mode="bypassPermissions",
-  run_in_background=True
+  run_in_background=True,
+  isolation="worktree"  # Omit if Worktrees: disabled
 )
 ```
 
@@ -106,10 +110,11 @@ Define SLIs/SLOs per service, error budgets, burn-rate alerts.
 Design chaos engineering scenarios and game-day playbook.
 Write runbooks to project root: docs/runbooks/
 Write workspace artifacts to: Claude-Production-Grade-Suite/sre/
-When complete, write a receipt JSON to Claude-Production-Grade-Suite/.orchestrator/receipts/T9-sre.json with task, agent, phase, status, artifacts, metrics, verification. Then mark your task as completed.""",
+When complete, write a receipt JSON to Claude-Production-Grade-Suite/.orchestrator/receipts/T9-sre.json with task, agent, phase, status, artifacts, metrics, effort, verification. Then mark your task as completed.""",
   subagent_type="general-purpose",
   mode="bypassPermissions",
-  run_in_background=True
+  run_in_background=True,
+  isolation="worktree"  # Omit if Worktrees: disabled
 )
 
 # T10: Data Scientist (conditional — auto-detect LLM/ML usage)
@@ -123,13 +128,31 @@ Read protocols from: Claude-Production-Grade-Suite/.protocols/
 Optimize: prompt engineering, token usage, semantic caching, fallback chains.
 Design: A/B testing infrastructure, experiment framework, data pipeline.
 Write workspace artifacts to: Claude-Production-Grade-Suite/data-scientist/
-When complete, write a receipt JSON to Claude-Production-Grade-Suite/.orchestrator/receipts/T10-data-scientist.json with task, agent, phase, status, artifacts, metrics, verification. Then mark your task as completed.""",
+When complete, write a receipt JSON to Claude-Production-Grade-Suite/.orchestrator/receipts/T10-data-scientist.json with task, agent, phase, status, artifacts, metrics, effort, verification. Then mark your task as completed.""",
   subagent_type="general-purpose",
   mode="bypassPermissions",
-  run_in_background=True
+  run_in_background=True,
+  isolation="worktree"  # Omit if Worktrees: disabled
 )
 # If NOT detected AND features.ai_ml is false:
 #   TaskUpdate(taskId=t10_id, status="completed")  # Skip
+```
+
+## Worktree Merge-Back
+
+If worktrees were used, merge each SHIP agent's branch back after each parallel pair completes:
+
+```python
+# After PARALLEL #5 (T7 + T8):
+for branch in ship_p5_worktree_branches:
+  Bash(f"git merge --no-ff {branch} -m 'production-grade: merge {branch}'")
+  Bash(f"git branch -d {branch}")
+
+# After PARALLEL #6 (T9 + T10):
+for branch in ship_p6_worktree_branches:
+  Bash(f"git merge --no-ff {branch} -m 'production-grade: merge {branch}'")
+  Bash(f"git branch -d {branch}")
+# If merge conflicts: git merge --abort, escalate to user
 ```
 
 ## Receipt Verification Before Gate 3

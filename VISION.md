@@ -27,7 +27,7 @@ A fully autonomous production pipeline that turns a high-level idea into a deplo
 
 ---
 
-## The Ten Principles
+## The Eleven Principles
 
 These are not suggestions. The first line of each principle is law. The hard rules beneath are mandatory behaviors that every skill in this system must exhibit.
 
@@ -163,9 +163,34 @@ These are not suggestions. The first line of each principle is law. The hard rul
 
 ---
 
+### XI. Autonomous Resilience
+
+**The system self-heals on failure and self-learns across runs — without accumulating unbounded cost.**
+
+*Why:* A pipeline that stops on the first gate rejection, the first test failure, or the first merge conflict is not autonomous — it is fragile. A pipeline that forgets everything between runs and re-discovers the same project patterns every time is not intelligent — it is amnesic. True autonomy requires two temporal dimensions: resilience in the moment (self-healing) and improvement over time (self-learning). But both must be implemented with ruthless awareness of their costs — every rework loop burns tokens, every learning artifact consumes context. Autonomy that bankrupts the user's token budget or bloats the context window until quality degrades is worse than no autonomy at all.
+
+**Hard rules:**
+
+Self-healing:
+- When a gate is rejected, the pipeline feeds the user's concerns back to the relevant agent, re-verifies, and re-presents — not stops. Max 2 rework cycles per gate to bound cost.
+- When a parallel agent fails, the pipeline isolates the failure (via worktrees) and continues other agents. The failed agent self-debugs up to 3 attempts before escalating.
+- When a merge conflict occurs after worktree isolation, the pipeline attempts resolution. If it cannot resolve, it escalates with context — not silently aborts.
+
+Self-learning:
+- Compound learnings from each pipeline run are written to the workspace: what worked, what failed, what was slow, what to skip next time.
+- Learning artifacts are compact summaries, not raw logs. A 10-line learning entry beats a 500-line execution trace.
+- Cross-run intelligence (recognizing project patterns, remembering decisions) is opt-in and bounded. Never automatically inject prior-run context that the user hasn't approved.
+
+Token discipline:
+- Every self-healing loop has a maximum iteration count. No unbounded retries.
+- Rework cycles reuse existing context (re-read the same artifacts) rather than re-discovering from scratch.
+- Learning artifacts are written once at pipeline end, not accumulated incrementally during execution. Mid-run, the context window is for building — not journaling.
+
+---
+
 ## The System
 
-These ten principles are not independent rules bolted together — they form a reinforcing system where each principle amplifies the others.
+These eleven principles are not independent rules bolted together — they form a reinforcing system where each principle amplifies the others.
 
 **Superalignment enables efficiency.** When all agents read the same artifacts, there is no rework, no conflicting implementations, no wasted parallel effort. Alignment is the precondition for safe parallelism.
 
@@ -179,7 +204,9 @@ These ten principles are not independent rules bolted together — they form a r
 
 **Minimal interaction enables efficiency.** Every question not asked is a pipeline that keeps moving. Every structured option is a decision made in seconds, not minutes. The three-gate model exists because it is the minimum viable set of human checkpoints for maximum autonomous throughput.
 
-The system works because every principle needs the others. Remove superalignment and parallelism produces conflicts. Remove ownership and autonomy produces broken output. Remove mathematical rigor and first-principles thinking becomes hand-waving. The ten are one.
+**Autonomous resilience closes the loop.** Self-healing means gate rejections and agent failures don't stop the pipeline — they trigger bounded recovery. Self-learning means each run leaves the system smarter for the next. But both are disciplined: bounded iterations prevent runaway cost, compact summaries prevent context bloat, and token-awareness ensures the cure never costs more than the disease.
+
+The system works because every principle needs the others. Remove superalignment and parallelism produces conflicts. Remove ownership and autonomy produces broken output. Remove mathematical rigor and first-principles thinking becomes hand-waving. Remove resilience and the pipeline is fragile — one rejection kills the run. The eleven are one.
 
 ---
 
@@ -187,7 +214,7 @@ The system works because every principle needs the others. Remove superalignment
 
 This document is the constitution of the production-grade ecosystem. Every skill — existing and future — operates within these principles.
 
-**When writing a new skill:** Read this document first. Your skill must embody all ten principles. If a principle doesn't seem to apply to your skill's domain, you haven't thought about it hard enough yet.
+**When writing a new skill:** Read this document first. Your skill must embody all eleven principles. If a principle doesn't seem to apply to your skill's domain, you haven't thought about it hard enough yet.
 
 **When modifying an existing skill:** Check your change against the principles. If it weakens any of them — even in service of a short-term goal — find a different approach.
 

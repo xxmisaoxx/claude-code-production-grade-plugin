@@ -32,6 +32,8 @@ Before creating SUSTAIN agent tasks, re-read from disk:
 
 ## PARALLEL #7: T11 + T12
 
+Read `Claude-Production-Grade-Suite/.orchestrator/settings.md` to check if `Worktrees: enabled`. If enabled, add `isolation="worktree"` to each Agent call below.
+
 ```python
 # T11: Technical Writer
 TaskUpdate(taskId=t11_id, status="in_progress")
@@ -45,10 +47,11 @@ Generate: API reference (from OpenAPI specs), developer guides, operational guid
 If features.documentation_site is true: scaffold Docusaurus site.
 Write docs to project root: docs/
 Write workspace artifacts to: Claude-Production-Grade-Suite/technical-writer/
-When complete, write a receipt JSON to Claude-Production-Grade-Suite/.orchestrator/receipts/T11-technical-writer.json with task, agent, phase, status, artifacts, metrics, verification. Then mark your task as completed.""",
+When complete, write a receipt JSON to Claude-Production-Grade-Suite/.orchestrator/receipts/T11-technical-writer.json with task, agent, phase, status, artifacts, metrics, effort, verification. Then mark your task as completed.""",
   subagent_type="general-purpose",
   mode="bypassPermissions",
-  run_in_background=True
+  run_in_background=True,
+  isolation="worktree"  # Omit if Worktrees: disabled
 )
 
 # T12: Skill Maker
@@ -60,16 +63,27 @@ Read protocols from: Claude-Production-Grade-Suite/.protocols/
 Generate 3-5 project-specific skills as SKILL.md files.
 Install skills to: .claude/skills/
 Write workspace artifacts to: Claude-Production-Grade-Suite/skill-maker/
-When complete, write a receipt JSON to Claude-Production-Grade-Suite/.orchestrator/receipts/T12-skill-maker.json with task, agent, phase, status, artifacts, metrics, verification. Then mark your task as completed.""",
+When complete, write a receipt JSON to Claude-Production-Grade-Suite/.orchestrator/receipts/T12-skill-maker.json with task, agent, phase, status, artifacts, metrics, effort, verification. Then mark your task as completed.""",
   subagent_type="general-purpose",
   mode="bypassPermissions",
-  run_in_background=True
+  run_in_background=True,
+  isolation="worktree"  # Omit if Worktrees: disabled
 )
+```
+
+## Worktree Merge-Back
+
+If worktrees were used, merge SUSTAIN agent branches back:
+
+```python
+for branch in sustain_worktree_branches:
+  Bash(f"git merge --no-ff {branch} -m 'production-grade: merge {branch}'")
+  Bash(f"git branch -d {branch}")
 ```
 
 ## T13: Compound Learning + Final Assembly
 
-After T11 and T12 complete:
+After T11 and T12 complete (and worktree branches are merged):
 
 ```python
 TaskUpdate(taskId=t13_id, status="in_progress")

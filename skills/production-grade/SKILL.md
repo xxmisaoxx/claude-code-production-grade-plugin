@@ -494,7 +494,8 @@ AskUserQuestion(questions=[{
   "question": "How should the pipeline parallelize work?",
   "header": "Performance Mode",
   "options": [
-    {"label": "Maximum parallelism (Recommended)", "description": "Fastest execution, lowest total token cost. Spawns up to 7+ concurrent agents. Best for most projects."},
+    {"label": "Maximum parallelism + worktree isolation (Recommended)", "description": "Fastest + safest. Each agent gets its own git worktree — zero file conflicts."},
+    {"label": "Maximum parallelism — shared directory", "description": "Fast but agents share the working directory. Use if worktrees cause issues."},
     {"label": "Standard", "description": "2-3 concurrent agents. Slower but lighter on system resources."},
     {"label": "Sequential", "description": "One agent at a time. Use for debugging or when inspecting each step."}
   ],
@@ -502,7 +503,26 @@ AskUserQuestion(questions=[{
 }])
 ```
 
-Store both choices in `Claude-Production-Grade-Suite/.orchestrator/settings.md`. Maximum parallelism is the recommended default — parallel execution is both faster AND cheaper in total tokens because each agent carries minimal context instead of accumulating prior work.
+Store all choices in `Claude-Production-Grade-Suite/.orchestrator/settings.md`:
+```markdown
+# Pipeline Settings
+Engagement: [express|standard|thorough|meticulous]
+Parallelism: [maximum|standard|sequential]
+Worktrees: [enabled|disabled]
+```
+
+Maximum parallelism with worktree isolation is the recommended default — parallel execution is both faster AND cheaper in total tokens because each agent carries minimal context instead of accumulating prior work. Worktree isolation eliminates file race conditions between concurrent agents.
+
+**Worktree requirements:** Git repo must have a clean state (no uncommitted changes). If dirty, the BUILD phase dispatcher will prompt the user to auto-commit or skip worktrees. See `phases/build.md` for the pre-flight check.
+
+**Show pre-pipeline cost estimate** after both selections:
+```
+  Est. cost: ~{low}K-{high}K tokens (~${low_cost}-${high_cost} at Sonnet pricing)
+  Agents: up to {N} concurrent · {M} total tasks
+  Worktrees: {enabled|disabled}
+```
+
+Use the cost estimation table from the visual-identity protocol to look up the range based on mode + engagement.
 
 7. **Detect existing workspace** — if `Claude-Production-Grade-Suite/.orchestrator/` has prior state, offer to resume or restart via AskUserQuestion.
 
@@ -614,11 +634,32 @@ AskUserQuestion(questions=[{
   "options": [
     {"label": "Approve — start building (Recommended)", "description": "Architecture locked, begin autonomous BUILD phase"},
     {"label": "Show architecture details", "description": "Walk through ADRs, diagrams, and API spec"},
-    {"label": "I have concerns", "description": "Flag issues with architecture decisions"},
+    {"label": "Rework architecture", "description": "Send concerns back to Architect for revision"},
     {"label": "Chat about this", "description": "Free-form input about the architecture"}
   ],
   "multiSelect": false
 }])
+```
+
+**Rework loop (Gate 2):**
+
+If user selects "Rework architecture":
+1. Ask what concerns they have (AskUserQuestion with common architecture concerns + free-form)
+2. Track rework cycle: read `Claude-Production-Grade-Suite/.orchestrator/rework-log.md`, increment Gate 2 rework count
+3. If rework count < 2: Re-invoke Solution Architect with the user's concerns as additional constraints. The architect re-reads its own previous output, applies the feedback, and produces updated artifacts.
+4. If rework count >= 2: Escalate — "Architecture has been revised twice. Approve current state or discuss further?"
+5. After rework: re-verify receipts, re-present Gate 2
+
+Print rework indicator in the gate ceremony:
+```
+  ⬥ GATE 2 — Architecture Approval (Rework {N}/2)        ⏱ {elapsed}
+```
+
+Write each rework cycle to `Claude-Production-Grade-Suite/.orchestrator/rework-log.md`:
+```markdown
+## Gate 2 — Rework {N}
+Concerns: {user's feedback}
+Changes: {what the architect modified}
 ```
 
 **Gate 3 — Production Readiness** (after T9):
@@ -654,12 +695,26 @@ AskUserQuestion(questions=[{
   "options": [
     {"label": "Ship it — production ready (Recommended)", "description": "Finalize assembly and deploy"},
     {"label": "Show full report", "description": "Display complete pipeline summary"},
-    {"label": "Fix issues first", "description": "Address remaining findings before shipping"},
+    {"label": "Rework — fix issues first", "description": "Run remediation cycle, then re-verify"},
     {"label": "Chat about this", "description": "Free-form input about production readiness"}
   ],
   "multiSelect": false
 }])
 ```
+
+**Rework loop (Gate 3):**
+
+If user selects "Rework — fix issues first":
+1. Track rework cycle in `Claude-Production-Grade-Suite/.orchestrator/rework-log.md`, increment Gate 3 rework count
+2. If rework count < 2:
+   a. Create a new remediation task targeting the remaining Critical/High findings
+   b. After remediation completes, re-run verification (original finding agents re-scan affected files)
+   c. Re-verify all receipts and remediation chains
+   d. Re-present Gate 3 with updated metrics
+3. If rework count >= 2: Escalate — "Pipeline has been through 2 remediation cycles. {N} findings remain. Ship with known issues or discuss further?"
+4. Show rework indicator: `⬥ GATE 3 — Production Readiness (Rework {N}/2)`
+
+The rework loop is self-healing: instead of stopping the pipeline on rejection, it feeds the user's concerns back into the relevant agents, re-verifies, and re-presents the gate. Max 2 cycles prevents infinite loops.
 
 ## Task Dependency Graph — Two-Wave Parallel Execution
 
@@ -1007,9 +1062,23 @@ Every agent follows:
 ║                                                                  ║
 ║   Agents: {N} used · Tasks: {M} completed · Errors: {K}         ║
 ║   Files: {N} created · Tests: {M} passing · Vulnerabilities: {K}║
+║   Worktrees: {enabled|disabled} · Rework cycles: {N}            ║
+║                                                                  ║
+║   Cost       {N} agents · {M} total tool calls · {K} files      ║
+║              Est. ~{X}K tokens · ~${A}-${B} at current pricing   ║
 ║                                                                  ║
 ╚══════════════════════════════════════════════════════════════════╝
 ```
+
+**Cost aggregation for final summary:**
+
+Read ALL receipts from `Claude-Production-Grade-Suite/.orchestrator/receipts/`. For each receipt, extract the `effort` field (files_read, files_written, tool_calls). Sum across all agents to produce:
+- Total agents used (count of unique receipt files)
+- Total tool calls (sum of all effort.tool_calls)
+- Total files processed (sum of all effort.files_read + effort.files_written, deduplicated)
+- Estimated tokens: use the cost estimation table from visual-identity protocol, adjusted by actual effort metrics. If actual tool_calls significantly exceed the estimate range, scale up proportionally.
+
+Read `Claude-Production-Grade-Suite/.orchestrator/rework-log.md` to get total rework cycles across all gates.
 
 ## Re-Anchoring Protocol
 
@@ -1075,3 +1144,8 @@ This shuts down all agents and frees resources. Do NOT leave agents idle — the
 | Duplicating framework control flow in UI | Don't link to `/api/auth/signin` — link to the protected destination and let middleware redirect. See boundary-safety protocol pattern 2. |
 | Global interceptors without conditional logic | Auth callbacks, API interceptors, and error handlers must branch on input. A hardcoded return value breaks every flow that passes through. See boundary-safety protocol pattern 4. |
 | Testing individual hops but not full user journeys | Auth test that checks "token issued" but never checks "user lands on dashboard" misses the real bugs. E2E must trace complete cross-system flows. |
+| Running parallel agents without worktree isolation | When parallelism is Maximum, use `isolation="worktree"` on all Agent calls. Agents sharing a working directory risk file race conditions. Skip worktrees only if repo is dirty and user declines auto-commit. |
+| Not merging worktree branches after wave completes | After each parallel wave, merge all worktree branches back to the working branch before the next phase reads their outputs. See phase dispatchers for merge-back instructions. |
+| Stopping pipeline on gate rejection | Gates are self-healing. On rejection, loop back to the relevant agent for rework (max 2 cycles), re-verify, re-present. Only stop if user explicitly cancels or rework limit reached. |
+| Not tracking rework cycles | Log every rework cycle to `.orchestrator/rework-log.md` with gate number, concerns, and changes. Rework count appears in gate ceremony header and final summary. |
+| Missing effort tracking in receipts | Every receipt must include an `effort` field with files_read, files_written, tool_calls. These aggregate into the cost dashboard in the final summary. |

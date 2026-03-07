@@ -2,6 +2,23 @@
 
 All notable changes to the Production Grade Plugin.
 
+## [5.3.0] — 2026-03-07
+
+### Added
+- **Worktree isolation for parallel agents** — all parallel Agent calls now use `isolation="worktree"` by default. Each concurrent agent gets its own git worktree — zero file race conditions. Dirty-state detection with auto-commit or fallback option. Merge-back orchestration after each wave completes. Worktree decision stored in pipeline settings.
+- **Self-healing gates (rework loops)** — gate rejection no longer stops the pipeline. When a user rejects at Gate 2 or Gate 3, concerns are fed back to the relevant agent (Solution Architect or Remediation Engineer) for rework. Re-verification and re-presentation happen automatically. Max 2 rework cycles per gate before escalation. All rework cycles logged to `.orchestrator/rework-log.md` with concerns and changes.
+- **Cost dashboard** — effort tracking in every receipt (`files_read`, `files_written`, `tool_calls`). Pre-pipeline cost estimate shown after engagement mode selection (based on mode × engagement × project complexity). Final summary includes aggregated cost metrics across all agents with estimated token usage.
+- **Cost estimation table** in visual-identity protocol — lookup table for estimated tokens by mode (Full Build, Feature, Harden, etc.) × engagement level (Express through Meticulous).
+
+### Changed
+- **Receipt protocol** — new `effort` field added to receipt schema (files_read, files_written, tool_calls). All agent prompts in phase dispatchers updated to include effort tracking.
+- **All 5 phase dispatchers** (define, build, harden, ship, sustain) — Agent calls include `isolation="worktree"`, worktree pre-flight check in BUILD, merge-back instructions after each parallel wave.
+- **Orchestrator parallelism preference** — new "Maximum + worktree isolation" option (recommended default). Settings now include `Worktrees: enabled|disabled`.
+- **Gate 2 ceremony** — "I have concerns" replaced with "Rework architecture" with explicit rework loop.
+- **Gate 3 ceremony** — "Fix issues first" replaced with "Rework — fix issues first" with remediation re-run and re-verification.
+- **Final summary template** — new cost line showing agents used, total tool calls, files processed, estimated tokens. Worktree and rework cycle counts included.
+- **DEV_PROTOCOL.md** — 3 new differentiators (worktree isolation, self-healing gates, cost dashboard). 3 new common quality failure entries. Cost estimation marked as shipped.
+
 ## [5.2.0] — 2026-03-07
 
 ### Added
