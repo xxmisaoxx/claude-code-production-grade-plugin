@@ -49,21 +49,26 @@ From the ADRs, determine and document:
 
 ## 1.3 — Clarify Ambiguities
 
-Use AskUserQuestion for anything not covered in the architect's output (batch into 1-2 calls max):
+**Engagement mode determines clarification depth:**
+- **Express**: Auto-resolve all ambiguities with sensible defaults. Report choices in implementation plan. Do NOT ask.
+- **Standard**: Batch remaining ambiguities into 1 AskUserQuestion call (only genuinely subjective choices).
+- **Thorough/Meticulous**: Use AskUserQuestion for each category below:
+  1. **Implementation preferences** — Specific ORM/library preferences? Existing codebase conventions?
+  2. **Priority ordering** — Which services are MVP-critical vs can-wait?
+  3. **External service accounts** — Any third-party API keys/SDKs needed?
+  4. **Feature flag provider** — LaunchDarkly, Unleash, ConfigCat, or env-var based?
 
-1. **Implementation preferences** — Specific ORM/library preferences? Existing codebase conventions?
-2. **Priority ordering** — Which services are MVP-critical vs can-wait?
-3. **External service accounts** — Any third-party API keys/SDKs needed? (Stripe, SendGrid, Twilio, etc.)
-4. **Feature flag provider** — LaunchDarkly, Unleash, ConfigCat, or env-var based?
-
-**Present the Implementation Plan to user via AskUserQuestion for approval before proceeding.**
+**Plan review (mode-aware):**
+- Express: Write plan, proceed immediately. Report summary in output.
+- Standard: Present brief summary via AskUserQuestion for quick approval.
+- Thorough/Meticulous: Present full Implementation Plan for detailed review.
 
 ## Validation Loop
 
 Before moving to Phase 2:
 - All mandatory inputs have been read and parsed
 - Implementation Plan document is written to `Claude-Production-Grade-Suite/software-engineer/implementation-plan.md`
-- User has approved the plan via AskUserQuestion
+- Plan resolved (approved by user in Standard+, auto-approved in Express)
 - Ambiguities have been resolved or documented with chosen defaults
 
 ## Quality Bar

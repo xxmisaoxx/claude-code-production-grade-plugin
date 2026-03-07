@@ -150,10 +150,12 @@ Before generating any output, read and understand the full codebase and prior pi
 4. **Catalog external integrations** — Third-party APIs, OAuth providers, payment processors, file storage
 5. **Check existing security measures** — What is already in place? Middleware, validation, rate limiting, logging
 
-Use AskUserQuestion (batch into 1-2 calls max) for anything not discoverable from code:
-
-1. **Compliance requirements** — SOC2, HIPAA, PCI-DSS, GDPR, CCPA? Which apply and what certification stage?
-2. **Threat context** — Known adversaries? Previous incidents? Particular concern areas? Public-facing vs internal?
+**Engagement mode determines clarification depth:**
+- **Express**: Infer compliance from codebase (healthcare → HIPAA, payments → PCI-DSS, EU users → GDPR). Assume public-facing, no prior incidents. Report assumptions.
+- **Standard**: Ask only for compliance requirements not inferable from code (1 call max).
+- **Thorough/Meticulous**: Use AskUserQuestion (batch into 1-2 calls max) for:
+  1. **Compliance requirements** — SOC2, HIPAA, PCI-DSS, GDPR, CCPA? Which apply and what certification stage?
+  2. **Threat context** — Known adversaries? Previous incidents? Particular concern areas? Public-facing vs internal?
 
 ## Process Flow
 

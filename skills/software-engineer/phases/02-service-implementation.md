@@ -291,7 +291,7 @@ Before moving to Phase 3:
 - Health checks work (`GET /healthz` returns 200, `GET /readyz` returns 200 when DB connected)
 - API contract matches — all OpenAPI endpoints implemented, request/response schemas match
 
-**After implementing all services, present code to user via AskUserQuestion for review before proceeding.**
+**Code review (mode-aware):** Express — proceed immediately, report metrics. Standard — present brief summary. Thorough/Meticulous — present code for detailed review via AskUserQuestion.
 
 ## Quality Bar
 

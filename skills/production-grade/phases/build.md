@@ -125,9 +125,9 @@ Use the Skill tool to invoke 'production-grade:frontend-engineer'. This loads yo
   Phase 2: Design System — functional defaults (tokens, theme, Tailwind)
   Phase 3: Components — UI primitives first (sequential), then layout+feature (parallel)
   Phase 4: Pages + Routing — parallel by route group, then functional verification (4b)
-  Phase 5: Design & Polish — MUST ask user for visual style FIRST via AskUserQuestion:
-    Creative | Elegance | High Tech | Corporate | Custom
-    Do NOT skip this prompt. Do NOT default to a basic style. Wait for user response.
+  Phase 5: Design & Polish — Style selection is engagement-mode-aware:
+    Express: auto-select best style for the domain, report choice, proceed.
+    Standard+: ask user via AskUserQuestion (Creative | Elegance | High Tech | Corporate | Custom).
   Phase 6: Testing & A11y — component tests, accessibility audit
 
 Write frontend to project root: frontend/

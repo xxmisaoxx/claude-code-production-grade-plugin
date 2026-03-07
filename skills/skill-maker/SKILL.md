@@ -96,7 +96,10 @@ digraph skill_maker {
 
 ## Phase 1: Interview (Quick)
 
-Ask 3-4 questions using AskUserQuestion, one at a time:
+**Engagement mode determines interview depth:**
+- **Express**: Infer all answers from the project context and agent prompts. Skip interview entirely. Report inferences.
+- **Standard**: Ask 1-2 key questions (purpose + trigger conditions). Auto-resolve the rest.
+- **Thorough/Meticulous**: Ask 3-4 questions using AskUserQuestion, one at a time:
 
 1. **What does this skill do?** — Core purpose in one sentence
 2. **When should it trigger?** — Specific words, patterns, or situations
@@ -143,7 +146,7 @@ Table of mistake -> fix pairs.
 - Use active voice, verb-first naming
 - Include keywords for discoverability (error messages, symptoms, tool names)
 
-**Present the SKILL.md to the user and ask for approval** using AskUserQuestion before proceeding.
+**Skill review (mode-aware):** Express — proceed to packaging, report skill summary. Standard — present brief summary for approval. Thorough/Meticulous — present full SKILL.md for detailed review via AskUserQuestion.
 
 ## Phase 3: Package as Plugin
 

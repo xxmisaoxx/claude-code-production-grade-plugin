@@ -2,6 +2,27 @@
 
 All notable changes to the Production Grade Plugin.
 
+## [5.4.0] — 2026-03-07
+
+### Added
+- **Harmonization protocol** — new Section 8 in DEV_PROTOCOL.md. Conflict matrix with 9 check categories, 7-level authority hierarchy (VISION > DEV_PROTOCOL > Protocols > Orchestrator > Phase dispatchers > Sub-skill SKILL.md > Agent() prompts), recurring audit triggers, and harmonization checklist. Ensures cohesiveness as the system evolves.
+- **Pipeline gates vs agent questions distinction** — formalized in VISION.md Principle IV and DEV_PROTOCOL. Pipeline gates (3 per run: BRD, Architecture, Production Readiness) are mode-independent. Agent questions (framework choice, style selection, test strategy) scale with engagement mode: zero in Express, full in Meticulous. An agent question firing in Express mode is now defined as a design bug.
+- **Cross-session enforcement via SessionStart hook** — new `hooks/hooks.json` and `hooks/session-guard.sh`. Detects projects built with production-grade (via `Claude-Production-Grade-Suite/` directory) and presents a courteous 3-option choice: use production-grade, work directly, or chat about it. Silent in non-production-grade projects.
+- **SUSTAIN phase CLAUDE.md directive** — production-grade native projects get a CLAUDE.md section prompting the 3-option choice at session start, ensuring cross-session consistency.
+
+### Changed
+- **Mode-aware AskUserQuestion across all skills** — 15+ mandatory user prompts across 11 files converted from "always ask" to engagement-mode-aware behavior. Express auto-resolves with sensible defaults and reports choices. Standard asks only subjective/irreversible decisions (1-2 per skill). Thorough surfaces all major decisions. Meticulous surfaces every decision point.
+- **UX Protocol Rule 6** rewritten as engagement-mode-aware autonomy spectrum with explicit table (Express/Standard/Thorough/Meticulous behaviors) plus "never mode-dependent" and "always mode-dependent" lists.
+- **Frontend Engineer** — style selection (Creative/Elegance/High Tech/Corporate) now mode-aware: Express auto-selects based on domain mapping, Standard+ asks user. Framework confirmation, page approval, and design review all mode-aware.
+- **Software Engineer** — context analysis clarifications, plan review, service implementation review, and integration review all mode-aware.
+- **DevOps** — 6-question infrastructure interview now mode-aware: Express infers from code, Standard asks unknowns, Thorough/Meticulous full interview.
+- **Security Engineer** — compliance/threat context questions mode-aware: Express infers from domain, Standard asks compliance only.
+- **Skill Maker** — Phase 1 interview mode-aware: Express skips entirely, Standard 1-2 questions.
+- **Technical Writer** — content audit approval and deployment options mode-aware: Express defaults to GitHub Pages.
+- **All Agent() prompts in phase dispatchers** — now include explicit `Use the Skill tool to invoke 'production-grade:<skill-name>'` instruction, ensuring sub-agents load their full SKILL.md methodology instead of flying blind with 5-10 line prompts.
+- **VISION.md** — fixed all numeric references: "Thirteen" → "Fourteen" agents (4 occurrences), "13 skills" → "14 agents", "original 13" → "built-in 14".
+- **DEV_PROTOCOL.md** — fixed "10 principles" → "11 principles". Added 3 new quality checklist items (mode-awareness, numeric consistency, Agent() prompt alignment).
+
 ## [5.3.0] — 2026-03-07
 
 ### Added

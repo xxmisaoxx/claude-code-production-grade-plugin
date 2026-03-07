@@ -240,7 +240,7 @@ Before moving to Phase 5:
 
 **Only proceed to Phase 5 after ALL functional verification checks pass.**
 
-**Present key pages to user via AskUserQuestion for approval before proceeding.**
+**Page review (mode-aware):** Express — proceed to Phase 5, report page count and flow verification results. Standard — present key metrics. Thorough/Meticulous — present key pages via AskUserQuestion for approval.
 
 ## Quality Bar
 

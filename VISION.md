@@ -10,13 +10,13 @@ The agents are not tools waiting for instructions. They are professionals who re
 
 This is not a collection of scripts. This is a compound intelligence system that gets smarter with every project it builds.
 
-**One install. Thirteen skills. Zero hand-holding. Production grade.**
+**One install. Fourteen agents. Zero hand-holding. Production grade.**
 
 ---
 
 ## What This Is
 
-A fully autonomous production pipeline that turns a high-level idea into a deployed, tested, secured, documented system. Thirteen specialized agents — from Product Manager to SRE — coordinated by a single orchestrator that thinks, adapts, and ships.
+A fully autonomous production pipeline that turns a high-level idea into a deployed, tested, secured, documented system. Fourteen specialized agents — from Product Manager to SRE — coordinated by a single orchestrator that thinks, adapts, and ships.
 
 ## What This Isn't
 
@@ -37,7 +37,7 @@ These are not suggestions. The first line of each principle is law. The hard rul
 
 **All agents align on shared artifacts as the single source of truth.**
 
-*Why:* Thirteen agents working from thirteen different understandings of the system produce chaos, not software. Alignment is not achieved through conversation — it is achieved through canonical artifacts that every agent reads and none contradict. The BRD is the business truth. The architecture docs are the technical truth. The API contracts are the integration truth. When an agent needs to make a decision, it reads the artifact — not its own assumptions.
+*Why:* Fourteen agents working from fourteen different understandings of the system produce chaos, not software. Alignment is not achieved through conversation — it is achieved through canonical artifacts that every agent reads and none contradict. The BRD is the business truth. The architecture docs are the technical truth. The API contracts are the integration truth. When an agent needs to make a decision, it reads the artifact — not its own assumptions.
 
 **Hard rules:**
 - Every agent reads upstream artifacts before producing its own work. No agent reinvents what a prior agent already decided.
@@ -80,7 +80,8 @@ These are not suggestions. The first line of each principle is law. The hard rul
 
 **Hard rules:**
 - All user interactions use structured options (AskUserQuestion), never open-ended text prompts. The user selects; they don't compose.
-- Maximum three strategic approval gates per pipeline run. Additional interrupts only for genuine blockers that cannot be self-resolved.
+- Maximum three strategic pipeline gates per run (BRD, Architecture, Production Readiness). These are non-negotiable checkpoints in all engagement modes.
+- Agent-level questions (framework choice, style selection, test strategy) are separate from pipeline gates and are controlled by engagement mode: zero in Express, scaled up through Standard/Thorough/Meticulous. An agent question that fires in Express mode is a design bug.
 - When presenting options, lead with the recommended choice. The user should be able to approve the default 80% of the time.
 
 ---
@@ -89,7 +90,7 @@ These are not suggestions. The first line of each principle is law. The hard rul
 
 **Run independent work streams concurrently. Never serialize what physics allows to parallelize.**
 
-*Why:* A pipeline that runs 13 skills sequentially when half of them are independent is wasting the user's most scarce resource: time. Backend and frontend are independent after architecture is locked. Security audit and code review are independent of each other. Parallelism is not a performance optimization — it is a design principle that respects the user's time.
+*Why:* A pipeline that runs 14 agents sequentially when half of them are independent is wasting the user's most scarce resource: time. Backend and frontend are independent after architecture is locked. Security audit and code review are independent of each other. Parallelism is not a performance optimization — it is a design principle that respects the user's time.
 
 **Hard rules:**
 - BUILD phase runs backend and frontend as concurrent agents. HARDEN phase runs security and code review concurrently.
@@ -119,7 +120,7 @@ These are not suggestions. The first line of each principle is law. The hard rul
 
 **Hard rules:**
 - When an agent identifies a recurring pattern or domain-specific workflow not covered by existing skills, it writes a new skill or artifact in its workspace rather than improvising repeatedly.
-- Self-created skills follow the same structure and quality bar as the original 13. They are documented, tested, and reusable.
+- Self-created skills follow the same structure and quality bar as the built-in 14. They are documented, tested, and reusable.
 - Agents write domain-specific artifacts (style guides, API conventions, data dictionaries) into their respective suite directories for downstream agents to consume.
 
 ---
@@ -200,7 +201,7 @@ These eleven principles are not independent rules bolted together — they form 
 
 **Mathematical rigor enables adaptive behavior.** When an agent can model the problem formally — quantify load, calculate costs, prove correctness — it can adapt to changes in requirements without guessing. The math transfers even when the specifics change.
 
-**Self-extension enables production-grade at scale.** A system that can only build what its original 13 skills cover will eventually produce generic output for novel domains. Self-extension means the quality bar holds even as the problem space grows.
+**Self-extension enables production-grade at scale.** A system that can only build what its original 14 agents cover will eventually produce generic output for novel domains. Self-extension means the quality bar holds even as the problem space grows.
 
 **Minimal interaction enables efficiency.** Every question not asked is a pipeline that keeps moving. Every structured option is a decision made in seconds, not minutes. The three-gate model exists because it is the minimum viable set of human checkpoints for maximum autonomous throughput.
 

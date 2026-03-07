@@ -36,6 +36,8 @@ These are the capabilities that no adjacent plugin offers in combination. Protec
 | **Self-healing gates** | Gate rejection loops back to the relevant agent for rework (max 2 cycles), re-verifies, re-presents. Pipeline never dead-ends on rejection. | No adjacent plugin has rework loops. Gate rejection = pipeline stop everywhere else. |
 | **Cost dashboard** | Effort tracking in every receipt (files_read, files_written, tool_calls). Pre-pipeline cost estimate. Final summary aggregates across all agents. | No adjacent plugin provides cost visibility. Users fly blind on token spend. |
 
+| **Harmonization protocol** | Recurring discipline to detect and fix design conflicts across 14 skills, 8 protocols, and 11 principles. Conflict matrix, authority hierarchy, engagement mode consistency checks. | No adjacent plugin has a self-consistency mechanism. Multi-agent systems accumulate contradictions silently. |
+
 **Rule: Any new feature must either strengthen an existing differentiator or introduce a new one. Features that merely match what others already do are low priority.**
 
 ---
@@ -223,15 +225,29 @@ Every interaction is `AskUserQuestion` with predefined options. Arrow keys + Ent
 
 This is non-negotiable. The target user is a non-technical founder or product person. They should never need to type a technical answer.
 
-### 3 Gate Maximum
+### 3 Pipeline Gates (Distinct from Agent Questions)
 
-Full pipeline: Gate 1 (Requirements), Gate 2 (Architecture), Gate 3 (Production Readiness). Between gates, agents work autonomously.
+Full pipeline: Gate 1 (Requirements), Gate 2 (Architecture), Gate 3 (Production Readiness). These are **pipeline-level strategic checkpoints** — they exist in all engagement modes, always.
 
 Single-skill modes: 0 gates. The intent is clear — just execute.
 
 Multi-skill modes: 1-2 gates depending on the mode.
 
-**Rule: Adding a gate is a major decision. Each gate is a full stop in the pipeline. If agents can self-resolve, they should.**
+**Gates are NOT agent questions.** A gate is a full-stop pipeline checkpoint where the user reviews the big picture. An agent question is a skill-level decision point (framework choice, style selection, test strategy). These are separate layers:
+
+| Layer | What | Controlled By |
+|-------|------|---------------|
+| **Pipeline gates** | Strategic go/no-go (BRD, Architecture, Production Readiness) | Always 3, all modes |
+| **Agent questions** | Technical/design choices within each skill | Engagement mode |
+
+| Mode | Pipeline Gates | Agent Questions |
+|------|---------------|----------------|
+| Express | 3 | 0 — auto-resolve everything, report decisions |
+| Standard | 3 | 1-2 per agent, only subjective/irreversible |
+| Thorough | 3 | All major decisions surfaced |
+| Meticulous | 3 | Every decision, user reviews before implementation |
+
+**Rule: Adding a gate is a major decision. Adding an agent question is a skill-level decision that MUST respect engagement mode. Never add a question that fires in Express mode.**
 
 ### Engagement Mode Propagation
 
@@ -361,7 +377,73 @@ Feature costs context:
 
 ---
 
-## 8. Non-Negotiable Constraints
+## 8. Harmonization Protocol
+
+A system with 14 skills, 8 protocols, 5 phase dispatchers, and 11 governing principles will accumulate design conflicts through normal iteration. New features get bolted on. Principles evolve. Agent prompts drift from their SKILL.md definitions. What was coherent at v5.0 develops contradictions by v5.4.
+
+**Harmonization is not a one-time fix — it is a recurring discipline.**
+
+### When to Harmonize
+
+| Trigger | Scope |
+|---------|-------|
+| Every 3-5 patches (e.g., after v5.5, v5.8, etc.) | Full audit |
+| After any VISION.md principle change | All skills + protocols against the changed principle |
+| After adding/modifying a protocol | All 14 skills that load it |
+| After modifying engagement mode definitions | All skills that reference engagement modes |
+| After modifying gate policy | All phase dispatchers + orchestrator |
+| Before any major version release | Full audit |
+
+### The Conflict Matrix
+
+Run these checks during every harmonization pass. Each row is a potential conflict surface:
+
+| Check | What Conflicts | How to Detect |
+|-------|---------------|---------------|
+| **Gates vs Modes** | 3-gate limit (Principle IV) vs Meticulous mode wanting max involvement | Search for "gate" in all phase files. Verify: gates are pipeline-level (always 3), agent questions are mode-dependent (0 in Express, many in Meticulous). These are different layers. |
+| **MUST-ask vs Express** | Hardcoded AskUserQuestion calls vs Express mode's "fully autonomous" | Search for "AskUserQuestion", "MUST ask", "STOP" in all skill/phase files. Every mandatory prompt must have a mode-aware escape: in Express, auto-resolve with a sensible default and report. |
+| **Authority overlaps** | Two skills claiming the same domain (e.g., both Security and Code Reviewer doing OWASP) | Read conflict-resolution.md authority table. Grep all SKILL.md files for domain claims. No two skills should own the same concern. |
+| **Protocol vs Skill** | Protocol says "always X" but a skill says "never X" or ignores X | For each protocol rule, grep all skills for contradicting instructions. |
+| **Orchestrator prompt vs SKILL.md** | Agent() prompt in phase dispatcher says one thing, the skill's SKILL.md says another | Compare every Agent() prompt in build/harden/ship/sustain.md against the corresponding SKILL.md. The SKILL.md is the authority — the prompt should align, not contradict. |
+| **VISION vs DEV_PROTOCOL** | A VISION principle's hard rules vs DEV_PROTOCOL's operational rules | Re-read both documents. Every DEV_PROTOCOL rule should trace to a VISION principle. Orphaned rules in DEV_PROTOCOL need justification or removal. |
+| **Engagement mode tables** | Different skills defining Express/Standard/Thorough/Meticulous differently | Grep all skills for engagement mode tables. All must use the same behavioral spectrum. Express is always fully autonomous. Meticulous always surfaces every decision. |
+| **Phase dependencies** | Phase N assumes output from Phase N-1 that might not exist in certain modes | Trace the data flow: what does Phase 3 read that Phase 2 writes? What if Express mode skipped a Phase 2 question? |
+| **Cross-reference counts** | DEV_PROTOCOL says "10 principles" but VISION has 11. README says "13 agents" but there are 14. | Grep for all numeric claims about the system and verify against actual counts. |
+
+### Authority Hierarchy
+
+When conflicts are found, resolve using this hierarchy (highest authority first):
+
+```
+1. VISION.md principles     — constitutional law, rarely changes
+2. DEV_PROTOCOL.md rules    — operational law, derives from VISION
+3. Protocol files            — universal agent behavior, derives from DEV_PROTOCOL
+4. Orchestrator SKILL.md     — pipeline control, implements protocols
+5. Phase dispatchers         — phase-level execution, implements orchestrator
+6. Sub-skill SKILL.md files  — agent methodology, constrained by protocols
+7. Agent() prompts           — must align with the SKILL.md they invoke
+```
+
+Lower layers NEVER override higher layers. If a sub-skill SKILL.md contradicts a protocol, the protocol wins. If a protocol contradicts a VISION principle, the principle wins.
+
+### Harmonization Checklist
+
+Run this after every harmonization pass:
+
+- [ ] Every VISION principle's hard rules are reflected in at least one protocol or DEV_PROTOCOL rule
+- [ ] Every protocol rule is consistent with every other protocol
+- [ ] Every skill's engagement mode table uses the same behavioral spectrum
+- [ ] Every "MUST ask" instruction has a mode-aware clause (Express gets auto-resolve)
+- [ ] Every Agent() prompt in phase dispatchers aligns with the invoked SKILL.md
+- [ ] All numeric claims (principle count, agent count, protocol count, gate count) match reality
+- [ ] The 3 gates are clearly distinguished from agent-level questions in all documentation
+- [ ] Authority boundaries in conflict-resolution.md match what skills actually claim
+- [ ] No two skills perform the same type of review/analysis
+- [ ] DEV_PROTOCOL section references are numbered correctly after any insertion
+
+---
+
+## 9. Non-Negotiable Constraints
 
 These cannot be relaxed, regardless of feature pressure:
 
@@ -384,7 +466,7 @@ These cannot be relaxed, regardless of feature pressure:
 
 ---
 
-## 9. Decision Framework
+## 10. Decision Framework
 
 When implementing a change, run through these questions in order:
 
@@ -415,7 +497,7 @@ When implementing a change, run through these questions in order:
 
 ---
 
-## 10. Quality Checklist (Pre-Commit)
+## 11. Quality Checklist (Pre-Commit)
 
 Before every commit, verify:
 
@@ -425,17 +507,20 @@ Before every commit, verify:
 - [ ] CHANGELOG.md is updated
 - [ ] README.md reflects any user-visible changes
 - [ ] No new open-ended questions introduced (all interactions use AskUserQuestion)
+- [ ] All AskUserQuestion calls are engagement-mode-aware (Express gets auto-resolve, not a prompt)
 - [ ] Completion summaries include concrete numbers
 - [ ] Common Mistakes tables are not duplicated across skills (put shared patterns in protocols)
 - [ ] New features are documented in the skill's SKILL.md, not just implemented
+- [ ] Numeric claims (agent count, principle count, protocol count) match reality
+- [ ] Agent() prompts in phase dispatchers align with the SKILL.md they invoke (Skill tool invocation line present)
 
 ---
 
-## 11. For AI Agents Reading This
+## 12. For AI Agents Reading This
 
 You are likely a Claude Code session implementing a change to this plugin. Here is what you need to know:
 
-1. **Read VISION.md first.** It contains the 10 principles that govern everything. This document operationalizes them.
+1. **Read VISION.md first.** It contains the 11 principles that govern everything. This document operationalizes them.
 2. **Read the orchestrator** (`skills/production-grade/SKILL.md`) to understand routing, modes, and gate flow.
 3. **Read the skill you're modifying** — its SKILL.md and all its phase files — before changing anything.
 4. **Read the protocols** (`skills/_shared/protocols/`) that the skill loads. Your changes must not violate them.

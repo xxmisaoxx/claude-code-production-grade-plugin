@@ -7,7 +7,7 @@
 <p align="center">
   <a href="https://github.com/nagisanzenin/claude-code-production-grade-plugin"><img src="https://img.shields.io/github/stars/nagisanzenin/claude-code-production-grade-plugin?style=social" alt="GitHub stars"></a>
   <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT License">
-  <img src="https://img.shields.io/badge/version-5.3.0-blue.svg" alt="Version">
+  <img src="https://img.shields.io/badge/version-5.4.0-blue.svg" alt="Version">
   <img src="https://img.shields.io/badge/agents-14-green.svg" alt="14 agents">
   <img src="https://img.shields.io/badge/protocols-8-red.svg" alt="7 protocols">
   <img src="https://img.shields.io/badge/execution%20modes-10-purple.svg" alt="10 modes">
@@ -33,6 +33,8 @@
 ## Release Timeline
 
 ```
+2026-03-07  v5.4  ●━━━ Harmonization — mode-aware autonomy, cross-session enforcement, agent skill loading
+                  │
 2026-03-07  v5.3  ●━━━ Worktree isolation, self-healing gates, cost dashboard
                   │
 2026-03-07  v5.2  ●━━━ Frontend overhaul — functional-first, design polish, 4 visual style presets
@@ -241,6 +243,15 @@ Not just full builds. The orchestrator reads your request and routes automatical
   │  100 users → monolith.                                       │
   │  10M users → microservices.                                  │
   │                                                              │
+  │  MODE-AWARE AUTONOMY          CROSS-SESSION PERSISTENCE      │
+  │  ───────────────────          ─────────────────────────      │
+  │  Express: zero questions,     SessionStart hook detects      │
+  │  auto-resolve everything.     production-grade projects.     │
+  │  Meticulous: every decision   New sessions get a courteous   │
+  │  surfaced. Agent questions    prompt: use plugin, work       │
+  │  scale independently of       directly, or chat about it.    │
+  │  pipeline gates.              Your workflow persists.         │
+  │                                                              │
   └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -277,11 +288,14 @@ All 14 agents load the same 8 protocols at startup:
 Choose your depth at pipeline start. Propagates to all 14 agents.
 
 ```
-  Express     ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  auto-derive, 2-3 questions
-  Standard    ████░░░░░░░░░░░░░░░░░░░░░░░░░░  balanced, 3-5 questions
-  Thorough    █████████████░░░░░░░░░░░░░░░░░░  deep discovery, 5-8 questions
-  Meticulous  ██████████████████████████████░░  full control, 8-12 questions
+  Express     ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  zero agent questions, auto-resolve all
+  Standard    ████░░░░░░░░░░░░░░░░░░░░░░░░░░  1-2 per skill, subjective/irreversible only
+  Thorough    █████████████░░░░░░░░░░░░░░░░░░  all major decisions surfaced
+  Meticulous  ██████████████████████████████░░  every decision point, full user control
 ```
+
+> **3 pipeline gates (BRD, Architecture, Production Readiness) always fire regardless of mode.**
+> Agent questions are separate — they scale from zero (Express) to exhaustive (Meticulous).
 
 ---
 
@@ -315,6 +329,7 @@ Large skills split into **router + on-demand phases**. Only what's needed loads.
   │   ~3x faster than sequential execution              │
   │  ~45% fewer input tokens from parallelism           │
   │    0  open-ended questions — all structured          │
+  │   11  governing principles                          │
   │    5  languages: TS, Go, Python, Rust, Java/Kotlin  │
   │                                                     │
   └────────────────────────────────────────────────────┘

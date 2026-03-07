@@ -137,7 +137,7 @@ Generate deployment config for the documentation site:
      NODE_VERSION = "20"
    ```
 
-Present deployment options via AskUserQuestion. Default to GitHub Pages.
+**Deployment choice (mode-aware):** Express — default to GitHub Pages, proceed. Standard+ — present deployment options via AskUserQuestion (default: GitHub Pages).
 
 ## 4.7 — Versioning Setup
 

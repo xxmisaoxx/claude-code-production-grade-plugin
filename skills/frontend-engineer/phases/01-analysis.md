@@ -34,7 +34,10 @@ Before beginning analysis, confirm the framework with the user via AskUserQuesti
 | **Styled Components / Emotion** | Runtime CSS-in-JS, declining in favor of zero-runtime solutions |
 | **Vanilla Extract** | Zero-runtime, type-safe styles, excellent for design systems |
 
-**Confirm framework, state management, and styling choices with user before proceeding.**
+**Engagement mode determines framework selection behavior:**
+- **Express**: Auto-select recommended defaults (Next.js + React Query + Zustand + Tailwind). Report selections in output. Do NOT ask.
+- **Standard**: Ask only if tech-stack.md is missing or ambiguous. If architecture already specifies a framework, use it without asking.
+- **Thorough/Meticulous**: Present all options via AskUserQuestion. Let user review and confirm.
 
 ## 1.1 User Flow Mapping
 
@@ -98,7 +101,7 @@ This skill reads from two upstream sources:
 ## Validation Loop
 
 Before moving to Phase 2:
-- Framework, state management, and styling choices confirmed with user
+- Framework, state management, and styling choices resolved (confirmed with user in Standard+, auto-selected in Express)
 - User flows mapped to pages and components
 - Page inventory complete with routes, layouts, auth requirements, and API endpoints
 - Component inventory classified by atomic design level

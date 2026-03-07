@@ -118,7 +118,7 @@ Before moving to Phase 5:
 - Migration runner can run up/down/status
 - All integration tests pass
 
-**After implementing all integration patterns, present to user via AskUserQuestion for review before proceeding.**
+**Integration review (mode-aware):** Express — proceed immediately, report metrics. Standard — present brief summary. Thorough/Meticulous — present integration patterns for detailed review via AskUserQuestion.
 
 ## Quality Bar
 
