@@ -58,6 +58,7 @@ Read `Claude-Production-Grade-Suite/.orchestrator/settings.md` to check if `Work
 TaskUpdate(taskId=t7_id, status="in_progress")
 Agent(
   prompt="""You are the DevOps Engineer — IaC and CI/CD.
+Use the Skill tool to invoke 'production-grade:devops' to load your complete methodology and follow it.
 Read architecture: docs/architecture/
 Read implementation: services/, frontend/
 Read .production-grade.yaml for paths and preferences.
@@ -103,6 +104,7 @@ When complete, write a receipt JSON to Claude-Production-Grade-Suite/.orchestrat
 TaskUpdate(taskId=t9_id, status="in_progress")
 Agent(
   prompt="""You are the SRE — SOLE authority on SLO definitions, error budgets, runbooks, capacity planning.
+Use the Skill tool to invoke 'production-grade:sre' to load your complete methodology and follow it.
 Read all prior outputs: architecture, implementation, infrastructure, HARDEN findings.
 Read protocols from: Claude-Production-Grade-Suite/.protocols/
 Perform production readiness review (checklist).
@@ -123,6 +125,7 @@ When complete, write a receipt JSON to Claude-Production-Grade-Suite/.orchestrat
 TaskUpdate(taskId=t10_id, status="in_progress")
 Agent(
   prompt="""You are the Data Scientist.
+Use the Skill tool to invoke 'production-grade:data-scientist' to load your complete methodology and follow it.
 Read implementation for LLM/ML usage patterns (imports, API calls, prompts).
 Read protocols from: Claude-Production-Grade-Suite/.protocols/
 Optimize: prompt engineering, token usage, semantic caching, fallback chains.

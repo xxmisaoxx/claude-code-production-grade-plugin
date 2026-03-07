@@ -97,10 +97,10 @@ When `use_worktrees` is True, add `isolation="worktree"` to each Agent call. Eac
 TaskUpdate(taskId=t3a_id, status="in_progress")
 Agent(
   prompt="""You are the Backend Engineer.
+Use the Skill tool to invoke 'production-grade:software-engineer' to load your complete methodology and follow it.
 Read architecture from: api/, schemas/, docs/architecture/
 Read protocols from: Claude-Production-Grade-Suite/.protocols/
 Read .production-grade.yaml for paths and preferences.
-Invoke the software-engineer skill pattern.
 Write services to project root: services/, libs/shared/
 Write workspace artifacts to: Claude-Production-Grade-Suite/software-engineer/
 TDD enforced: write test → watch fail → implement → watch pass → refactor.
@@ -119,7 +119,17 @@ Read API contracts from: api/
 Read BRD user stories from: Claude-Production-Grade-Suite/product-manager/BRD/
 Read protocols from: Claude-Production-Grade-Suite/.protocols/
 Read .production-grade.yaml for framework and styling preferences.
-Invoke the frontend-engineer skill pattern.
+
+Use the Skill tool to invoke 'production-grade:frontend-engineer'. This loads your complete SKILL.md with a 6-phase build process. You MUST follow all 6 phases in order:
+  Phase 1: Analysis — read BRD, API contracts, select framework
+  Phase 2: Design System — functional defaults (tokens, theme, Tailwind)
+  Phase 3: Components — UI primitives first (sequential), then layout+feature (parallel)
+  Phase 4: Pages + Routing — parallel by route group, then functional verification (4b)
+  Phase 5: Design & Polish — MUST ask user for visual style FIRST via AskUserQuestion:
+    Creative | Elegance | High Tech | Corporate | Custom
+    Do NOT skip this prompt. Do NOT default to a basic style. Wait for user response.
+  Phase 6: Testing & A11y — component tests, accessibility audit
+
 Write frontend to project root: frontend/
 Write workspace artifacts to: Claude-Production-Grade-Suite/frontend-engineer/
 When complete, write a receipt JSON to Claude-Production-Grade-Suite/.orchestrator/receipts/T3b-frontend-engineer.json with task, agent, phase, status, artifacts, metrics, effort, verification. Then mark your task as completed.""",
@@ -140,6 +150,7 @@ T4 begins containerization as soon as backend is done, even if frontend is still
 TaskUpdate(taskId=t4_id, status="in_progress")
 Agent(
   prompt="""You are the DevOps Containerization Engineer.
+Use the Skill tool to invoke 'production-grade:devops' to load your complete methodology and follow it.
 Read services from: services/
 Read architecture from: docs/architecture/
 Read .production-grade.yaml for paths and preferences.

@@ -31,6 +31,7 @@ Read `Claude-Production-Grade-Suite/.orchestrator/settings.md` to check if `Work
 TaskUpdate(taskId=t5_id, status="in_progress")
 Agent(
   prompt="""You are the QA Engineer.
+Use the Skill tool to invoke 'production-grade:qa-engineer' to load your complete methodology and follow it.
 Read implementation: services/, frontend/ (if exists), api/
 Read protocols from: Claude-Production-Grade-Suite/.protocols/
 Read .production-grade.yaml for paths.tests and paths.services.
@@ -49,6 +50,7 @@ When complete, write a receipt JSON to Claude-Production-Grade-Suite/.orchestrat
 TaskUpdate(taskId=t6a_id, status="in_progress")
 Agent(
   prompt="""You are the Security Engineer — SOLE authority on OWASP, STRIDE, PII, encryption.
+Use the Skill tool to invoke 'production-grade:security-engineer' to load your complete methodology and follow it.
 No other skill performs security review. This is YOUR exclusive domain.
 Read all implementation code: services/, frontend/, infrastructure/
 Read protocols from: Claude-Production-Grade-Suite/.protocols/
@@ -67,6 +69,7 @@ When complete, write a receipt JSON to Claude-Production-Grade-Suite/.orchestrat
 TaskUpdate(taskId=t6b_id, status="in_progress")
 Agent(
   prompt="""You are the Code Reviewer — architecture conformance and code quality ONLY.
+Use the Skill tool to invoke 'production-grade:code-reviewer' to load your complete methodology and follow it.
 DO NOT perform OWASP, STRIDE, or any security review — security-engineer is sole authority.
 Cross-reference: "See security-engineer findings for security context."
 Read architecture: docs/architecture/, api/
