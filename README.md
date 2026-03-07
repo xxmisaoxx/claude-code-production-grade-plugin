@@ -24,7 +24,7 @@
 
 ## Built With This Plugin
 
-**Built something with this plugin? Email nagi.builds@gmail.com to get featured here.**
+**Built something with this plugin? [Open a PR](https://github.com/nagisanzenin/claude-code-production-grade-plugin/pulls) to add your project here.**
 
 | Project | Live | Description |
 |---------|------|-------------|
