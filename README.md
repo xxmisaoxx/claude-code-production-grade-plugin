@@ -24,6 +24,8 @@
 
 ## Built With This Plugin
 
+**Built something with this plugin? Email nagi_builds@gmail.com to get featured here.**
+
 | Project | Live | Description |
 |---------|------|-------------|
 | **PingBase** | [pingbasez.vercel.app](https://pingbasez.vercel.app/) | Free uptime monitoring — get emailed when your website goes down. GitHub OAuth, Stripe billing, Turso DB. |
